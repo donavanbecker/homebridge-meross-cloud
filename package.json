@@ -20,7 +20,7 @@
   "scripts": {
     "update": "npm update && npm install",
     "clean": "npm clean-install",
-    "audit": "npm audit && npm audit fix",
+    "audit": "npm audit fix",
     "lint": "eslint src/**.ts",
     "watch": "npm run build && npm link && nodemon",
     "build": "rimraf ./dist && tsc",
@@ -30,10 +30,6 @@
     {
       "type": "Paypal",
       "url": "https://www.paypal.me/donavanbecker"
-    },
-    {
-      "type": "Buy Me a Coffee",
-      "url": "buymeacoff.ee/donavanbecker"
     }
   ],
   "keywords": [

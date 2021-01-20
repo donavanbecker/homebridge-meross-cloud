@@ -71,6 +71,18 @@ export class MerossCloudPlatform implements DynamicPlatformPlugin {
     this.config.devicediscovery;
     this.config!.email!;
     this.config!.password!;
+
+    // Hide Devices by DeviceID
+    this.config.hide_device = this.config.hide_device || [];
+
+    if (this.config.refreshRate! < 120) {
+      throw new Error('Refresh Rate must be above 120 (2 minutes).');
+    }
+
+    if (!this.config.refreshRate) {
+      this.config.refreshRate! = 300;
+      this.log.warn('Using Default Refresh Rate.');
+    }
   }
 
   discoverDevices() {
@@ -86,17 +98,18 @@ export class MerossCloudPlatform implements DynamicPlatformPlugin {
       this.deviceInfo(meross, device, deviceDef, deviceId);
 
       device.on('connected', () => {
-        // For Future Devices
         switch (deviceDef.deviceType) {
           case 'mss620':
-            this.log.info('Discovered %s %s', deviceDef.devName, deviceDef.deviceType, deviceDef.uuid);
-            this.createMSS620(device, deviceDef, deviceId);
+            this.log.info('Discovered %s %s', deviceDef.devName, deviceDef.deviceType, deviceDef.uuid); 
+            //this.log.debug(JSON.stringify(device));
+            this.log.debug(JSON.stringify(deviceDef));
+            this.createMSS620(deviceDef, device, deviceId);
             break;
           default:
             this.log.info(
-              `A Meross Device has been discovered with Device Type: ${deviceDef.deviceType}, which is currently not supported.`,
-              'Enable Device Discovery on Plugin Settings, Then Submit Meross Cloud Info Here: https://git.io/JLD51.',
-              //'Submit Feature Requests Here: https://git.io/JLD5y,',
+              'Device Type: %s, is currently not supported.',
+              deviceDef.deviceType,
+              'Submit Feature Requests Here: https://git.io/JtfVC',
             );
         }
       });
@@ -107,7 +120,7 @@ export class MerossCloudPlatform implements DynamicPlatformPlugin {
     });
   }
 
-  private async createMSS620(device, deviceId, deviceDef) {
+  private async createMSS620(deviceDef, device, deviceId) {
     const uuid = this.api.hap.uuid.generate(`${deviceDef.devName}-${deviceDef.uuid}-${deviceDef.deviceType}`);
 
     // see if an accessory with the same uuid has already been registered and restored from
@@ -125,14 +138,13 @@ export class MerossCloudPlatform implements DynamicPlatformPlugin {
         // create the accessory handler for the restored accessory
         // this is imported from `platformAccessory.ts`
         new mss620(this, existingAccessory, device, deviceId, deviceDef);
-        this.log.debug(`Humidifier UDID: ${deviceDef.devName}-${deviceDef.uuid}-${deviceDef.deviceType}`);
+        this.log.debug(`${deviceDef.deviceType} UDID: ${deviceDef.devName}-${deviceDef.uuid}-${deviceDef.deviceType}`);
       } else {
         this.unregisterPlatformAccessories(existingAccessory);
       }
     } else {
       // the accessory does not yet exist, so we need to create it
       this.log.info('Adding new accessory:', `${deviceDef.devName} ${deviceDef.deviceType}`);
-      this.log.debug(`Registering new device: ${deviceDef.devName} ${deviceDef.deviceType} - ${deviceDef.uuid}`);
 
       // create a new accessory
       const accessory = new this.api.platformAccessory(`${deviceDef.devName} ${deviceDef.deviceType}`, uuid);
@@ -145,7 +157,7 @@ export class MerossCloudPlatform implements DynamicPlatformPlugin {
       // create the accessory handler for the newly create accessory
       // this is imported from `platformAccessory.ts`
       new mss620(this, accessory, device, deviceId, deviceDef);
-      this.log.debug(`Humidifier UDID: ${deviceDef.devName}-${deviceDef.uuid}-${deviceDef.deviceType}`);
+      this.log.debug(`${deviceDef.deviceType} UDID: ${deviceDef.devName}-${deviceDef.uuid}-${deviceDef.deviceType}`);
 
       // link the accessory to your platform
       this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
