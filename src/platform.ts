@@ -94,16 +94,14 @@ export class MerossCloudPlatform implements DynamicPlatformPlugin {
     const meross = new MerossCloud(options);
 
     meross.on('deviceInitialized', (deviceId, deviceDef, device) => {
-      this.log.debug('New device ' + deviceId + ': ' + JSON.stringify(deviceDef));
-      this.deviceInfo(meross, device, deviceDef, deviceId);
+      this.log.debug('New device ' + deviceId + ': ' + JSON.stringify(device));
+      this.deviceInfo(meross, device, deviceId);
 
       device.on('connected', () => {
         switch (deviceDef.deviceType) {
           case 'mss620':
             this.log.info('Discovered %s %s', deviceDef.devName, deviceDef.deviceType, deviceDef.uuid);
-            //this.log.debug(JSON.stringify(device));
-            // this.log.debug(JSON.stringify(deviceDef));
-            this.createMSS620(deviceDef, device, deviceId);
+            this.createMSS620(device);
             break;
           default:
             this.log.info(
@@ -116,12 +114,14 @@ export class MerossCloudPlatform implements DynamicPlatformPlugin {
     });
 
     meross.connect((error) => {
-      this.log.debug('connect error: ' + error);
+      if (error !== null) {
+        this.log.error('connect error: ' + error);
+      }
     });
   }
 
-  private async createMSS620(deviceDef, device, deviceId) {
-    const uuid = this.api.hap.uuid.generate(`${deviceDef.devName}-${deviceDef.uuid}-${deviceDef.deviceType}`);
+  private async createMSS620(device) {
+    const uuid = this.api.hap.uuid.generate(`${device.dev.devName}-${device.dev.uuid}-${device.dev.deviceType}`);
 
     // see if an accessory with the same uuid has already been registered and restored from
     // the cached devices we stored in the `configureAccessory` method above
@@ -129,7 +129,7 @@ export class MerossCloudPlatform implements DynamicPlatformPlugin {
 
     if (existingAccessory) {
       // the accessory already exists
-      if (deviceDef.onlineStatus === 1) {
+      if (device.dev.onlineStatus === 1) {
         this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
 
         // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
@@ -137,17 +137,17 @@ export class MerossCloudPlatform implements DynamicPlatformPlugin {
         this.api.updatePlatformAccessories([existingAccessory]);
         // create the accessory handler for the restored accessory
         // this is imported from `platformAccessory.ts`
-        new mss620(this, existingAccessory, device, deviceId, deviceDef);
-        this.log.debug(`${deviceDef.deviceType} UDID: ${deviceDef.devName}-${deviceDef.uuid}-${deviceDef.deviceType}`);
+        new mss620(this, existingAccessory, device);
+        this.log.debug(`${device.dev.deviceType} UDID: ${device.dev.devName}-${device.dev.uuid}-${device.dev.deviceType}`);
       } else {
         this.unregisterPlatformAccessories(existingAccessory);
       }
     } else {
       // the accessory does not yet exist, so we need to create it
-      this.log.info('Adding new accessory:', `${deviceDef.devName} ${deviceDef.deviceType}`);
+      this.log.info('Adding new accessory:', `${device.dev.devName} ${device.dev.deviceType}`);
 
       // create a new accessory
-      const accessory = new this.api.platformAccessory(`${deviceDef.devName} ${deviceDef.deviceType}`, uuid);
+      const accessory = new this.api.platformAccessory(`${device.dev.devName} ${device.dev.deviceType}`, uuid);
 
       // store a copy of the device object in the `accessory.context`
       // the `context` property can be used to store any data about the accessory you may need
@@ -156,8 +156,8 @@ export class MerossCloudPlatform implements DynamicPlatformPlugin {
       // accessory.context.firmwareRevision = findaccessories.accessoryAttribute.softwareRevision;
       // create the accessory handler for the newly create accessory
       // this is imported from `platformAccessory.ts`
-      new mss620(this, accessory, device, deviceId, deviceDef);
-      this.log.debug(`${deviceDef.deviceType} UDID: ${deviceDef.devName}-${deviceDef.uuid}-${deviceDef.deviceType}`);
+      new mss620(this, accessory, device);
+      this.log.debug(`${device.dev.deviceType} UDID: ${device.dev.devName}-${device.dev.uuid}-${device.dev.deviceType}`);
 
       // link the accessory to your platform
       this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
@@ -171,12 +171,11 @@ export class MerossCloudPlatform implements DynamicPlatformPlugin {
     this.log.info('Removing existing accessory from cache:', existingAccessory.displayName);
   }
 
-  public deviceInfo(meross, device, deviceId, deviceDef) {
+  public deviceInfo(meross, device, deviceId) {
     if (this.config.devicediscovery) {
       this.log.warn(JSON.stringify(meross));
       this.log.warn(JSON.stringify(device));
       this.log.warn(JSON.stringify(deviceId));
-      this.log.warn(JSON.stringify(deviceDef));
     }
   }
 }
