@@ -100,9 +100,9 @@ export class MerossCloudPlatform implements DynamicPlatformPlugin {
       device.on('connected', () => {
         switch (deviceDef.deviceType) {
           case 'mss620':
-            this.log.info('Discovered %s %s', deviceDef.devName, deviceDef.deviceType, deviceDef.uuid); 
+            this.log.info('Discovered %s %s', deviceDef.devName, deviceDef.deviceType, deviceDef.uuid);
             //this.log.debug(JSON.stringify(device));
-            this.log.debug(JSON.stringify(deviceDef));
+            // this.log.debug(JSON.stringify(deviceDef));
             this.createMSS620(deviceDef, device, deviceId);
             break;
           default:
