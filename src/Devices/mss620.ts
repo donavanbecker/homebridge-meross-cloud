@@ -50,29 +50,33 @@ export class mss620 {
       .setCharacteristic(this.platform.Characteristic.SerialNumber, this.deviceDef.uuid)
       .setCharacteristic(this.platform.Characteristic.FirmwareRevision, this.deviceDef.fmwareVersion);
     for (const channels of deviceDef.channels) {
-    // get the LightBulb service if it exists, otherwise create a new Outlet service
-    // you can create multiple services for each accessory
-      (this.service = this.accessory.getService(this.platform.Service.Outlet) || this.accessory.addService(this.platform.Service.Outlet)),
-      `${this.deviceDef.devName} ${this.deviceDef.deviceType}`;
+      // get the LightBulb service if it exists, otherwise create a new Outlet service
+      // you can create multiple services for each accessory
+      // {"type":"Switch","devName":"Nursery Lamps","devIconId":"device001"}
+      if (channels.devName) {
+        this.platform.log.debug('Setting Up %s ', channels.devName, JSON.stringify(channels));
+        (this.service = this.accessory.getService(channels.devName) || this.accessory.addService(this.platform.Service.Outlet, channels.devName, channels.devName)),
+          `${this.deviceDef.devName} ${this.deviceDef.deviceType}`;
 
-      // To avoid "Cannot add a Service with the same UUID another Service without also defining a unique 'subtype' property." error,
-      // when creating multiple services of the same type, you need to use the following syntax to specify a name and subtype id:
-      // this.accessory.getService('NAME') ?? this.accessory.addService(this.platform.Service.Outlet, 'NAME', 'USER_DEFINED_SUBTYPE');
+        // To avoid "Cannot add a Service with the same UUID another Service without also defining a unique 'subtype' property." error,
+        // when creating multiple services of the same type, you need to use the following syntax to specify a name and subtype id:
+        // this.accessory.getService('NAME') ?? this.accessory.addService(this.platform.Service.Outlet, 'NAME', 'USER_DEFINED_SUBTYPE');
 
-      // set the service name, this is what is displayed as the default name on the Home app
-      // in this example we are using the name we stored in the `accessory.context` in the `discoverDevices` method.
-      this.platform.log.debug(JSON.stringify(deviceDef.channels));
-    
-      this.service.setCharacteristic(this.platform.Characteristic.Name, `${this.deviceDef.devName} ${this.deviceDef.deviceType}`);
+        // set the service name, this is what is displayed as the default name on the Home app
+        // in this example we are using the name we stored in the `accessory.context` in the `discoverDevices` method.
 
-      // each service must implement at-minimum the "required characteristics" for the given service type
-      // see https://developers.homebridge.io/#/service/Outlet
 
-      // create handlers for required characteristics
-      this.service
-        .getCharacteristic(this.platform.Characteristic.On)
-        .on(CharacteristicEventTypes.GET, this.handleOn1stGet.bind(this))
-        .on(CharacteristicEventTypes.SET, this.handleOn1stSet.bind(this));
+        this.service.setCharacteristic(this.platform.Characteristic.Name, `${channels.devName} ${this.deviceDef.deviceType}`);
+
+        // each service must implement at-minimum the "required characteristics" for the given service type
+        // see https://developers.homebridge.io/#/service/Outlet
+
+        // create handlers for required characteristics
+        this.service
+          .getCharacteristic(this.platform.Characteristic.On)
+          .on(CharacteristicEventTypes.GET, this.handleOn1stGet.bind(this))
+          .on(CharacteristicEventTypes.SET, this.handleOn1stSet.bind(this));
+      }
     }
 
     this.service.getCharacteristic(this.platform.Characteristic.OutletInUse).on('get', this.handleOutletInUseGet.bind(this));
@@ -99,8 +103,8 @@ export class mss620 {
       try {
         await this.pushChanges();
       } catch (e) {
-        this.platform.log.error(JSON.stringify(e.message));
-        this.platform.log.debug('%s %s -', this.deviceDef.deviceType, this.accessory.displayName, JSON.stringify(e));
+        this.platform.log.error('ERROR: ',JSON.stringify(e.message));
+        this.platform.log.debug('ERROR: %s %s -', this.deviceDef.deviceType, this.accessory.displayName, JSON.stringify(e));
       }
       this.OutletUpdateInProgress = false;
     });
@@ -131,11 +135,11 @@ export class mss620 {
       this.updateHomeKitCharacteristics();
     } catch (e) {
       this.platform.log.error(
-        '%s - Failed to update status of %s',
+        'ERROR: %s - Failed to update status of %s',
         this.deviceDef.deviceType,
         this.deviceDef.devName,
         JSON.stringify(e.message),
-        this.platform.log.debug('%s %s -', this.deviceDef.deviceType, this.accessory.displayName, JSON.stringify(e)),
+        this.platform.log.debug('ERROR %s %s -', this.deviceDef.deviceType, this.accessory.displayName, JSON.stringify(e)),
       );
     }
   }
