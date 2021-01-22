@@ -11,7 +11,7 @@ import { eventNames, on } from 'process';
  * An instance of this class is created for each accessory your platform registers
  * Each accessory may expose multiple services of different service types.
  */
-export class mss620 {
+export class mss110 {
   private service!: Service;
 
   doSmartPlugUpdate: any;
@@ -49,36 +49,34 @@ export class mss620 {
       .setCharacteristic(this.platform.Characteristic.Model, this.deviceDef.deviceType)
       .setCharacteristic(this.platform.Characteristic.SerialNumber, this.deviceDef.uuid)
       .setCharacteristic(this.platform.Characteristic.FirmwareRevision, this.deviceDef.fmwareVersion);
-    for (const channels of deviceDef.channels) {
-      // get the LightBulb service if it exists, otherwise create a new Outlet service
-      // you can create multiple services for each accessory
-      // {"type":"Switch","devName":"Nursery Lamps","devIconId":"device001"}
-      if (channels.devName) {
-        this.platform.log.debug('Setting Up %s ', channels.devName, JSON.stringify(channels));
-        (this.service = this.accessory.getService(channels.devName)
-        || this.accessory.addService(this.platform.Service.Outlet, channels.devName, channels.devName)),
-        `${this.deviceDef.devName} ${this.deviceDef.deviceType}`;
 
-        // To avoid "Cannot add a Service with the same UUID another Service without also defining a unique 'subtype' property." error,
-        // when creating multiple services of the same type, you need to use the following syntax to specify a name and subtype id:
-        // this.accessory.getService('NAME') ?? this.accessory.addService(this.platform.Service.Outlet, 'NAME', 'USER_DEFINED_SUBTYPE');
+    // get the LightBulb service if it exists, otherwise create a new Outlet service
+    // you can create multiple services for each accessory
+    // {"type":"Switch","devName":"Nursery Lamps","devIconId":"device001"}
 
-        // set the service name, this is what is displayed as the default name on the Home app
-        // in this example we are using the name we stored in the `accessory.context` in the `discoverDevices` method.
+    this.platform.log.debug('Setting Up %s ', deviceDef.devName, JSON.stringify(deviceDef));
+    (this.service = this.accessory.getService(deviceDef.devName)
+        || this.accessory.addService(this.platform.Service.Outlet, deviceDef.devName, deviceDef.devName)),
+    `${this.deviceDef.devName} ${this.deviceDef.deviceType}`;
+
+    // To avoid "Cannot add a Service with the same UUID another Service without also defining a unique 'subtype' property." error,
+    // when creating multiple services of the same type, you need to use the following syntax to specify a name and subtype id:
+    // this.accessory.getService('NAME') ?? this.accessory.addService(this.platform.Service.Outlet, 'NAME', 'USER_DEFINED_SUBTYPE');
+
+    // set the service name, this is what is displayed as the default name on the Home app
+    // in this example we are using the name we stored in the `accessory.context` in the `discoverDevices` method.
 
 
-        this.service.setCharacteristic(this.platform.Characteristic.Name, `${channels.devName} ${this.deviceDef.deviceType}`);
+    this.service.setCharacteristic(this.platform.Characteristic.Name, `${deviceDef.devName} ${this.deviceDef.deviceType}`);
 
-        // each service must implement at-minimum the "required characteristics" for the given service type
-        // see https://developers.homebridge.io/#/service/Outlet
+    // each service must implement at-minimum the "required characteristics" for the given service type
+    // see https://developers.homebridge.io/#/service/Outlet
 
-        // create handlers for required characteristics
-        this.service
-          .getCharacteristic(this.platform.Characteristic.On)
-          .on(CharacteristicEventTypes.GET, this.handleOnGet.bind(this))
-          .on(CharacteristicEventTypes.SET, this.handleOnSet.bind(this));
-      }
-    }
+    // create handlers for required characteristics
+    this.service
+      .getCharacteristic(this.platform.Characteristic.On)
+      .on(CharacteristicEventTypes.GET, this.handleOnGet.bind(this))
+      .on(CharacteristicEventTypes.SET, this.handleOnSet.bind(this));
 
     this.service.getCharacteristic(this.platform.Characteristic.OutletInUse).on('get', this.handleOutletInUseGet.bind(this));
 
@@ -115,11 +113,8 @@ export class mss620 {
    * Parse the device status from the SwitchBot api
    */
   parseStatus() {
-    if (this.channel.onoff === 1){
-      this.On === true;
-    } else {
-      this.On === false;
-    }
+    this.On === true;
+    this.On === false;
     this.onoff = this.On;
     this.OutletInUse === true;
   }
@@ -128,47 +123,41 @@ export class mss620 {
    * Asks the SwitchBot API for the latest device information
    */
   async refreshStatus() {
-    if (this.deviceDef.channels) {
-      for (const channels of this.deviceDef.channels) {
-        if (channels.devName) {
-          this.device.on('data', (namespace: string, payload: any) => {
-            this.platform.log.debug('DEV: ' + this.deviceId + ' ' + namespace + ' - data: ' + JSON.stringify(payload));     
-            this.devicestatus = payload;
-            for (const channel of this.devicestatus.togglex){
-              this.channel = channel.channel;
-            }
-
-            try {
-              this.parseStatus();
-              this.updateHomeKitCharacteristics();
-            } catch (e) {
-              this.platform.log.error(
-                '%s: %s - Failed to update status of %s',
-                this.deviceDef.devName,
-                this.deviceDef.deviceType,
-                this.deviceDef.devName,
-                JSON.stringify(e.message),
-                this.platform.log.debug(
-                  '%s: %s %s -', 
-                  this.deviceDef.devName, 
-                  this.deviceDef.deviceType, 
-                  this.accessory.displayName,
-                  JSON.stringify(e)),
-              );
-            }
-          });
-        }
+    this.device.on('data', (namespace: string, payload: any) => {
+      this.platform.log.debug('DEV: ' + this.deviceId + ' ' + namespace + ' - data: ' + JSON.stringify(payload));     
+      this.devicestatus = payload;
+      for (const channel of this.devicestatus.togglex){
+        this.channel = channel.channel;
       }
-    } else if (!this.deviceDef.channels) {
-      this.platform.log.debug('%s Invalid Channel', this.deviceDef.channels);
-    }
+
+      try {
+        this.parseStatus();
+        this.updateHomeKitCharacteristics();
+      } catch (e) {
+        this.platform.log.error(
+          '%s: %s - Failed to update status of %s',
+          this.deviceDef.devName,
+          this.deviceDef.deviceType,
+          this.deviceDef.devName,
+          JSON.stringify(e.message),
+          this.platform.log.debug(
+            '%s: %s %s -', 
+            this.deviceDef.devName, 
+            this.deviceDef.deviceType, 
+            this.accessory.displayName,
+            JSON.stringify(e)),
+        );
+      }
+    });
+       
+      
   }
 
   /**
    * Pushes the requested changes to the SwitchBot API
    */
   async pushChanges() {
-    this.device.controlToggleX(this.deviceDef.channel, (this.onoff ? 1 : 0), (err, res) => {
+    this.device.controlToggle(this.deviceDef, (this.onoff ? 1 : 0), (err, res) => {
       this.platform.log.debug('ToggleX Response: err: ' + err + ', res: ' + JSON.stringify(res));
       this.platform.log.info(this.deviceId + '.' + this.channel + ': set value ' + this.On);
     });
@@ -183,13 +172,7 @@ export class mss620 {
    * Updates the status for each of the HomeKit Characteristics
    */
   updateHomeKitCharacteristics() {
-    for (const channels of this.deviceDef.channels) {
-      if (channels.devName){
-
-        this.platform.log.warn('Update: %s', channels);
-        this.service.updateCharacteristic(this.platform.Characteristic.On, this.On);
-      }
-    }
+    this.service.updateCharacteristic(this.platform.Characteristic.On, this.On);
     this.service.updateCharacteristic(this.platform.Characteristic.OutletInUse, this.OutletInUse);
   }
 
