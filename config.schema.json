@@ -24,6 +24,13 @@
         "type": "string",
         "description": "Your Meross Account Password."
       },
+      "hide_device": {
+        "title": "Hide Devices",
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
       "devicediscovery": {
         "name": "Device Discovery",
         "type": "boolean",

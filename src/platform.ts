@@ -134,7 +134,7 @@ export class MerossCloudPlatform implements DynamicPlatformPlugin {
 
     if (existingAccessory) {
       // the accessory already exists
-      if (deviceDef.onlineStatus === 1) {
+      if (deviceDef.onlineStatus === 1 && !this.config.hide_device?.includes(deviceId)) {
         this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
 
         // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
@@ -147,7 +147,7 @@ export class MerossCloudPlatform implements DynamicPlatformPlugin {
       } else {
         this.unregisterPlatformAccessories(existingAccessory);
       }
-    } else {
+    } else if (!this.config.hide_device?.includes(deviceId)) {
       // the accessory does not yet exist, so we need to create it
       this.log.info('Adding new accessory:', `${deviceDef.devName} ${deviceDef.deviceType}`);
 
@@ -167,6 +167,15 @@ export class MerossCloudPlatform implements DynamicPlatformPlugin {
       // link the accessory to your platform
       this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
       this.accessories.push(accessory);
+    } else {
+      if (!this.config.hide_device?.includes(deviceId)) {
+        this.log.error(
+          'Unable to Register new device: %s %s - %s',
+          device.deviceName,
+          device.deviceType,
+          device.deviceId,
+        );
+      }
     }
   }
 
@@ -179,7 +188,7 @@ export class MerossCloudPlatform implements DynamicPlatformPlugin {
 
     if (existingAccessory) {
       // the accessory already exists
-      if (deviceDef.onlineStatus === 1) {
+      if (deviceDef.onlineStatus === 1 && !this.config.hide_device?.includes(deviceId)) {
         this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
 
         // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
@@ -192,7 +201,7 @@ export class MerossCloudPlatform implements DynamicPlatformPlugin {
       } else {
         this.unregisterPlatformAccessories(existingAccessory);
       }
-    } else {
+    } else if (!this.config.hide_device?.includes(deviceId)) {
       // the accessory does not yet exist, so we need to create it
       this.log.info('Adding new accessory:', `${deviceDef.devName} ${deviceDef.deviceType}`);
 
@@ -212,6 +221,15 @@ export class MerossCloudPlatform implements DynamicPlatformPlugin {
       // link the accessory to your platform
       this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
       this.accessories.push(accessory);
+    } else {
+      if (!this.config.hide_device?.includes(deviceId)) {
+        this.log.error(
+          'Unable to Register new device: %s %s - %s',
+          device.deviceName,
+          device.deviceType,
+          device.deviceId,
+        );
+      }
     }
   }
 
