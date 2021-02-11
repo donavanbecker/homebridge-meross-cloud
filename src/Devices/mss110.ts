@@ -19,7 +19,6 @@ export class mss110 {
   OutletUpdateInProgress: any;
   OutletUpdate: any;
   meross: any;
-  channel: any;
   On!: CharacteristicValue;
   onoff: any;
   devicestatus: any;
@@ -75,10 +74,7 @@ export class mss110 {
     // create handlers for required characteristics
     this.service
       .getCharacteristic(this.platform.Characteristic.On)
-      .on(CharacteristicEventTypes.GET, this.handleOnGet.bind(this))
       .on(CharacteristicEventTypes.SET, this.handleOnSet.bind(this));
-
-    this.service.getCharacteristic(this.platform.Characteristic.OutletInUse).on('get', this.handleOutletInUseGet.bind(this));
 
     // Retrieve initial values and updateHomekit
     //this.refreshStatus();
@@ -126,10 +122,6 @@ export class mss110 {
     this.device.on('data', (namespace: string, payload: any) => {
       this.platform.log.debug('DEV: ' + this.deviceId + ' ' + namespace + ' - data: ' + JSON.stringify(payload));     
       this.devicestatus = payload;
-      for (const channel of this.devicestatus.togglex){
-        this.channel = channel.channel;
-      }
-
       try {
         this.parseStatus();
         this.updateHomeKitCharacteristics();
@@ -159,7 +151,7 @@ export class mss110 {
   async pushChanges() {
     this.device.controlToggle(this.deviceDef, (this.onoff ? 1 : 0), (err, res) => {
       this.platform.log.debug('ToggleX Response: err: ' + err + ', res: ' + JSON.stringify(res));
-      this.platform.log.info(this.deviceId + '.' + this.channel + ': set value ' + this.On);
+      this.platform.log.info(this.deviceId + '.' + ': set value ' + this.On);
     });
     this.platform.log.debug('Outlet %s pushChanges -', this.accessory.displayName);
 
@@ -177,36 +169,13 @@ export class mss110 {
   }
 
   /**
-   * Handle requests to get the current value of the "On" characteristic
-   */
-  handleOnGet(callback) {
-    this.platform.log.debug('%s Triggered GET On', this.deviceDef.devName);
-
-    // set this to a valid value for On
-    const currentValue = this.On;
-
-    callback(null, currentValue);
-  }
-
-  /**
    * Handle requests to set the "On" characteristic
    */
-  handleOnSet(value, callback) {
+  async handleOnSet(value, callback) {
     this.platform.log.debug('%s Triggered SET On:', this.deviceDef.devName, value);
 
-    this.pushChanges();
+    await this.pushChanges();
+    this.refreshStatus();
     callback(null);
-  }
-
-  /**
-   * Handle requests to get the current value of the "Outlet In Use" characteristic
-   */
-  handleOutletInUseGet(callback) {
-    this.platform.log.debug('Triggered GET OutletInUse');
-
-    // set this to a valid value for OutletInUse
-    const currentValue = this.OutletInUse;
-
-    callback(null, currentValue);
   }
 }
