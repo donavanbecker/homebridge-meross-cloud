@@ -3,7 +3,7 @@ import { Service, PlatformAccessory, Characteristic, CharacteristicEventTypes, C
 import { MerossCloudPlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { debounceTime, skipWhile, tap } from 'rxjs/operators';
-import MerossCloud, { MerossCloudDevice } from 'meross-cloud';
+import MerossCloud, { DeviceDefinition, MerossCloudDevice } from 'meross-cloud';
 import { eventNames, on } from 'process';
 
 /**
@@ -21,19 +21,19 @@ export class mss620 {
   meross: any;
   channel: any;
   On!: CharacteristicValue;
-  onoff: any;
+  onoff!: number;
   devicestatus: any;
 
   constructor(
     private readonly platform: MerossCloudPlatform,
     private accessory: PlatformAccessory,
-    public device,
-    public deviceId,
-    public deviceDef,
+    public device: MerossCloudDevice,
+    public deviceId: DeviceDefinition['uuid'],
+    public deviceDef: DeviceDefinition,
   ) {
     // default placeholders
-    this.On === true;
-    this.OutletInUse === true;
+    this.On = false;
+    this.OutletInUse = false;
 
     // this is subject we use to track when we need to POST changes to the SwitchBot API
     this.OutletUpdate = new Subject();
@@ -43,12 +43,13 @@ export class mss620 {
     this.refreshStatus();
 
     // set accessory information
-    this.accessory
+    accessory
       .getService(this.platform.Service.AccessoryInformation)!
       .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Meross')
-      .setCharacteristic(this.platform.Characteristic.Model, this.deviceDef.deviceType)
-      .setCharacteristic(this.platform.Characteristic.SerialNumber, this.deviceDef.uuid)
-      .setCharacteristic(this.platform.Characteristic.FirmwareRevision, this.deviceDef.fmwareVersion);
+      .setCharacteristic(this.platform.Characteristic.Model, deviceDef.deviceType)
+      .setCharacteristic(this.platform.Characteristic.SerialNumber, deviceDef.uuid)
+      .getCharacteristic(this.platform.Characteristic.FirmwareRevision).updateValue(accessory.context.firmwareRevision || '4.1.29');
+
     for (const channels of deviceDef.channels) {
       // get the LightBulb service if it exists, otherwise create a new Outlet service
       // you can create multiple services for each accessory
@@ -56,8 +57,8 @@ export class mss620 {
       if (channels.devName) {
         this.platform.log.debug('Setting Up %s ', channels.devName, JSON.stringify(channels));
         (this.service = this.accessory.getService(channels.devName)
-        || this.accessory.addService(this.platform.Service.Outlet, channels.devName, channels.devName)),
-        `${this.deviceDef.devName} ${this.deviceDef.deviceType}`;
+          || this.accessory.addService(this.platform.Service.Outlet, channels.devName, channels.devName)),
+        `${deviceDef.devName} ${deviceDef.deviceType}`;
 
         // To avoid "Cannot add a Service with the same UUID another Service without also defining a unique 'subtype' property." error,
         // when creating multiple services of the same type, you need to use the following syntax to specify a name and subtype id:
@@ -67,7 +68,7 @@ export class mss620 {
         // in this example we are using the name we stored in the `accessory.context` in the `discoverDevices` method.
 
 
-        this.service.setCharacteristic(this.platform.Characteristic.Name, `${channels.devName} ${this.deviceDef.deviceType}`);
+        this.service.setCharacteristic(this.platform.Characteristic.Name, `${channels.devName} ${deviceDef.deviceType}`);
 
         // each service must implement at-minimum the "required characteristics" for the given service type
         // see https://developers.homebridge.io/#/service/Outlet
@@ -75,15 +76,20 @@ export class mss620 {
         // create handlers for required characteristics
         this.service
           .getCharacteristic(this.platform.Characteristic.On)
-          .on(CharacteristicEventTypes.GET, this.handleOnGet.bind(this))
-          .on(CharacteristicEventTypes.SET, this.handleOnSet.bind(this));
+          .onGet(async () => {
+            return this.On;
+          })
+          .onSet(async (value: CharacteristicValue) => {
+            this.OnSet(value);
+          });
       }
     }
 
-    this.service.getCharacteristic(this.platform.Characteristic.OutletInUse).on('get', this.handleOutletInUseGet.bind(this));
+    this.service.getCharacteristic(this.platform.Characteristic.OutletInUse).onGet(async () => {
+      return this.OutletInUse;
+    });
 
     // Retrieve initial values and updateHomekit
-    //this.refreshStatus();
     this.updateHomeKitCharacteristics();
 
     // Start an update interval
@@ -115,12 +121,11 @@ export class mss620 {
    * Parse the device status from the SwitchBot api
    */
   parseStatus() {
-    if (this.channel.onoff === 1){
+    if (this.channel.onoff === 1) {
       this.On === true;
     } else {
       this.On === false;
     }
-    this.onoff = this.On;
     this.OutletInUse === true;
   }
 
@@ -132,12 +137,11 @@ export class mss620 {
       for (const channels of this.deviceDef.channels) {
         if (channels.devName) {
           this.device.on('data', (namespace: string, payload: any) => {
-            this.platform.log.debug('DEV: ' + this.deviceId + ' ' + namespace + ' - data: ' + JSON.stringify(payload));     
+            this.platform.log.debug('DEV: ' + this.deviceId + ' ' + namespace + ' - data: ' + JSON.stringify(payload));
             this.devicestatus = payload;
-            for (const channel of this.devicestatus.togglex){
+            for (const channel of this.devicestatus.togglex) {
               this.channel = channel.channel;
             }
-
             try {
               this.parseStatus();
               this.updateHomeKitCharacteristics();
@@ -149,9 +153,9 @@ export class mss620 {
                 this.deviceDef.devName,
                 JSON.stringify(e.message),
                 this.platform.log.debug(
-                  '%s: %s %s -', 
-                  this.deviceDef.devName, 
-                  this.deviceDef.deviceType, 
+                  '%s: %s %s -',
+                  this.deviceDef.devName,
+                  this.deviceDef.deviceType,
                   this.accessory.displayName,
                   JSON.stringify(e)),
               );
@@ -168,15 +172,24 @@ export class mss620 {
    * Pushes the requested changes to the SwitchBot API
    */
   async pushChanges() {
-    this.device.controlToggleX(this.deviceDef.channel, (this.onoff ? 1 : 0), (err, res) => {
-      this.platform.log.debug('ToggleX Response: err: ' + err + ', res: ' + JSON.stringify(res));
-      this.platform.log.info(this.deviceId + '.' + this.channel + ': set value ' + this.On);
-    });
-    this.platform.log.debug('Outlet %s pushChanges -', this.accessory.displayName);
-
-    // Make the API request
-    this.platform.log.debug('Outlet %s Changes pushed -', this.accessory.displayName);
-    await this.refreshStatus();
+    for (const channel of this.devicestatus.togglex) {
+      this.channel = channel.channel;
+    
+      if (this.On && this.channel !== 0) {
+        this.device.controlToggleX(this.channel, true, (err, res) => {
+          this.platform.log.debug('ToggleX Response: err: ' + err + ', res: ' + JSON.stringify(res));
+          this.platform.log.info(this.deviceId + '.' + this.channel + ': set value ' + this.On);
+        });
+      } else if (!this.On && this.channel !== 0) {
+        this.device.controlToggleX(this.channel, false, (err, res) => {
+          this.platform.log.debug('ToggleX Response: err: ' + err + ', res: ' + JSON.stringify(res));
+          this.platform.log.info(this.deviceId + '.' + this.channel + ': set value ' + this.On);
+        });
+      }
+      // Make the API request
+      this.platform.log.debug('Outlet %s Changes pushed -', this.accessory.displayName);
+      await this.refreshStatus();
+    }
   }
 
   /**
@@ -184,8 +197,7 @@ export class mss620 {
    */
   updateHomeKitCharacteristics() {
     for (const channels of this.deviceDef.channels) {
-      if (channels.devName){
-
+      if (channels.devName) {
         this.platform.log.warn('Update: %s', channels);
         this.service.updateCharacteristic(this.platform.Characteristic.On, this.On);
       }
@@ -194,36 +206,12 @@ export class mss620 {
   }
 
   /**
-   * Handle requests to get the current value of the "On" characteristic
-   */
-  handleOnGet(callback) {
-    this.platform.log.debug('%s Triggered GET On', this.deviceDef.devName);
-
-    // set this to a valid value for On
-    const currentValue = this.On;
-
-    callback(null, currentValue);
-  }
-
-  /**
    * Handle requests to set the "On" characteristic
    */
-  handleOnSet(value, callback) {
+  private OnSet(value: CharacteristicValue) {
     this.platform.log.debug('%s Triggered SET On:', this.deviceDef.devName, value);
 
+    this.On = value;
     this.pushChanges();
-    callback(null);
-  }
-
-  /**
-   * Handle requests to get the current value of the "Outlet In Use" characteristic
-   */
-  handleOutletInUseGet(callback) {
-    this.platform.log.debug('Triggered GET OutletInUse');
-
-    // set this to a valid value for OutletInUse
-    const currentValue = this.OutletInUse;
-
-    callback(null, currentValue);
   }
 }

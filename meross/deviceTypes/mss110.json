@@ -1,0 +1,41 @@
+[
+    {
+        "uuid": "2010275590986451852948e1e9397ad0",
+        "onlineStatus": 1,
+        "devName": "Smart Plug Mini",
+        "devIconId": "device001",
+        "bindTime": 1611278450,
+        "deviceType": "mss110",
+        "subType": "us",
+        "channels": [
+            {}
+        ],
+        "region": "us",
+        "fmwareVersion": "4.1.14",
+        "hdwareVersion": "4.0.0",
+        "userDevIcon": "",
+        "iconType": 1,
+        "skillNumber": "",
+        "domain": "mqtt-us.meross.com",
+        "reservedDomain": "mqtt-us-alter.meross.com"
+    },
+    {
+        "togglex": [
+            {
+                "onoff": 1,
+                "lmTime": 1614057867,
+                "channel": 0
+            },
+            {
+                "onoff": 1,
+                "lmTime": 1614057867,
+                "channel": 1
+            },
+            {
+                "onoff": 1,
+                "lmTime": 1614057867,
+                "channel": 2
+            }
+        ]
+    }
+]

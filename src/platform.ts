@@ -144,7 +144,7 @@ export class MerossCloudPlatform implements DynamicPlatformPlugin {
 
         // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
         existingAccessory.context.SerialNumber = deviceDef.uuid;
-        existingAccessory.context.firmwareRevision = deviceDef.fmwareVersion;
+        existingAccessory.context.firmwareRevision = deviceDef.fmwareVersion || '4.1.29';
         this.api.updatePlatformAccessories([existingAccessory]);
         // create the accessory handler for the restored accessory
         // this is imported from `platformAccessory.ts`
@@ -199,7 +199,7 @@ export class MerossCloudPlatform implements DynamicPlatformPlugin {
 
         // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
         existingAccessory.context.SerialNumber = deviceDef.uuid;
-        existingAccessory.context.firmwareRevision = deviceDef.fmwareVersion;
+        existingAccessory.context.firmwareRevision = deviceDef.fmwareVersion || '4.1.14';
         this.api.updatePlatformAccessories([existingAccessory]);
         // create the accessory handler for the restored accessory
         // this is imported from `platformAccessory.ts`

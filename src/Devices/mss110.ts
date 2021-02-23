@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Service, PlatformAccessory, Characteristic, CharacteristicEventTypes, CharacteristicValue } from 'homebridge';
+import { Service, PlatformAccessory, CharacteristicValue } from 'homebridge';
 import { MerossCloudPlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { debounceTime, skipWhile, tap } from 'rxjs/operators';
-import MerossCloud, { MerossCloudDevice } from 'meross-cloud';
+import MerossCloud, { DeviceDefinition, MerossCloudDevice } from 'meross-cloud';
 import { eventNames, on } from 'process';
 
 /**
@@ -14,25 +14,22 @@ import { eventNames, on } from 'process';
 export class mss110 {
   private service!: Service;
 
-  doSmartPlugUpdate: any;
-  OutletInUse;
-  OutletUpdateInProgress: any;
-  OutletUpdate: any;
-  meross: any;
   On!: CharacteristicValue;
-  onoff: any;
+  OutletInUse!: CharacteristicValue;
+  OutletUpdate: Subject<unknown>;
+  OutletUpdateInProgress: boolean;
   devicestatus: any;
 
   constructor(
     private readonly platform: MerossCloudPlatform,
     private accessory: PlatformAccessory,
-    public device,
-    public deviceId,
-    public deviceDef,
+    public device: MerossCloudDevice,
+    public deviceId: DeviceDefinition['uuid'],
+    public deviceDef: DeviceDefinition,
   ) {
     // default placeholders
-    this.On === true;
-    this.OutletInUse === true;
+    this.On = false;
+    this.OutletInUse = false;
 
     // this is subject we use to track when we need to POST changes to the SwitchBot API
     this.OutletUpdate = new Subject();
@@ -42,12 +39,12 @@ export class mss110 {
     this.refreshStatus();
 
     // set accessory information
-    this.accessory
+    accessory
       .getService(this.platform.Service.AccessoryInformation)!
       .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Meross')
-      .setCharacteristic(this.platform.Characteristic.Model, this.deviceDef.deviceType)
-      .setCharacteristic(this.platform.Characteristic.SerialNumber, this.deviceDef.uuid)
-      .setCharacteristic(this.platform.Characteristic.FirmwareRevision, this.deviceDef.fmwareVersion);
+      .setCharacteristic(this.platform.Characteristic.Model, deviceDef.deviceType)
+      .setCharacteristic(this.platform.Characteristic.SerialNumber, deviceDef.uuid)
+      .getCharacteristic(this.platform.Characteristic.FirmwareRevision).updateValue(accessory.context.firmwareRevision || '4.1.14');
 
     // get the LightBulb service if it exists, otherwise create a new Outlet service
     // you can create multiple services for each accessory
@@ -55,8 +52,8 @@ export class mss110 {
 
     this.platform.log.debug('Setting Up %s ', deviceDef.devName, JSON.stringify(deviceDef));
     (this.service = this.accessory.getService(deviceDef.devName)
-        || this.accessory.addService(this.platform.Service.Outlet, deviceDef.devName, deviceDef.devName)),
-    `${this.deviceDef.devName} ${this.deviceDef.deviceType}`;
+      || this.accessory.addService(this.platform.Service.Outlet, deviceDef.devName, deviceDef.devName)),
+    `${deviceDef.devName} ${deviceDef.deviceType}`;
 
     // To avoid "Cannot add a Service with the same UUID another Service without also defining a unique 'subtype' property." error,
     // when creating multiple services of the same type, you need to use the following syntax to specify a name and subtype id:
@@ -66,7 +63,7 @@ export class mss110 {
     // in this example we are using the name we stored in the `accessory.context` in the `discoverDevices` method.
 
 
-    this.service.setCharacteristic(this.platform.Characteristic.Name, `${deviceDef.devName} ${this.deviceDef.deviceType}`);
+    this.service.setCharacteristic(this.platform.Characteristic.Name, `${deviceDef.devName} ${deviceDef.deviceType}`);
 
     // each service must implement at-minimum the "required characteristics" for the given service type
     // see https://developers.homebridge.io/#/service/Outlet
@@ -74,10 +71,20 @@ export class mss110 {
     // create handlers for required characteristics
     this.service
       .getCharacteristic(this.platform.Characteristic.On)
-      .on(CharacteristicEventTypes.SET, this.handleOnSet.bind(this));
+      .onGet(async () => {
+        return this.On;
+      })
+      .onSet(async (value: CharacteristicValue) => {
+        this.OnSet(value);
+      });
+
+    this.service
+      .getCharacteristic(this.platform.Characteristic.OutletInUse)
+      .onGet(async () => {
+        return this.OutletInUse;
+      });
 
     // Retrieve initial values and updateHomekit
-    //this.refreshStatus();
     this.updateHomeKitCharacteristics();
 
     // Start an update interval
@@ -109,9 +116,8 @@ export class mss110 {
    * Parse the device status from the SwitchBot api
    */
   parseStatus() {
-    this.On === true;
-    this.On === false;
-    this.onoff = this.On;
+    //this.On === true;
+    //this.On === false;
     this.OutletInUse === true;
   }
 
@@ -120,7 +126,7 @@ export class mss110 {
    */
   async refreshStatus() {
     this.device.on('data', (namespace: string, payload: any) => {
-      this.platform.log.debug('DEV: ' + this.deviceId + ' ' + namespace + ' - data: ' + JSON.stringify(payload));     
+      this.platform.log.debug('DEV: ' + this.deviceId + ' ' + namespace + ' - data: ' + JSON.stringify(payload));
       this.devicestatus = payload;
       try {
         this.parseStatus();
@@ -133,28 +139,35 @@ export class mss110 {
           this.deviceDef.devName,
           JSON.stringify(e.message),
           this.platform.log.debug(
-            '%s: %s %s -', 
-            this.deviceDef.devName, 
-            this.deviceDef.deviceType, 
+            '%s: %s %s -',
+            this.deviceDef.devName,
+            this.deviceDef.deviceType,
             this.accessory.displayName,
             JSON.stringify(e)),
         );
       }
     });
-       
-      
+
+
   }
 
   /**
    * Pushes the requested changes to the SwitchBot API
    */
   async pushChanges() {
-    this.device.controlToggle(this.deviceDef, (this.onoff ? 1 : 0), (err, res) => {
-      this.platform.log.debug('ToggleX Response: err: ' + err + ', res: ' + JSON.stringify(res));
-      this.platform.log.info(this.deviceId + '.' + ': set value ' + this.On);
-    });
-    this.platform.log.debug('Outlet %s pushChanges -', this.accessory.displayName);
-
+    if (this.On) {
+      this.device.controlToggle(true, (err, res) => {
+        this.platform.log.debug('ToggleX Response: err: ' + err + ', res: ' + JSON.stringify(res));
+        this.platform.log.info(this.deviceId + '.' + ': set value ' + this.On)
+        ;
+      });
+    } else {
+      this.device.controlToggle(false, (err, res) => {
+        this.platform.log.debug('ToggleX Response: err: ' + err + ', res: ' + JSON.stringify(res));
+        this.platform.log.info(this.deviceId + '.' + ': set value ' + this.On)
+        ;
+      });
+    }
     // Make the API request
     this.platform.log.debug('Outlet %s Changes pushed -', this.accessory.displayName);
     await this.refreshStatus();
@@ -164,18 +177,21 @@ export class mss110 {
    * Updates the status for each of the HomeKit Characteristics
    */
   updateHomeKitCharacteristics() {
-    this.service.updateCharacteristic(this.platform.Characteristic.On, this.On);
-    this.service.updateCharacteristic(this.platform.Characteristic.OutletInUse, this.OutletInUse);
+    if (this.On !== undefined) {
+      this.service.updateCharacteristic(this.platform.Characteristic.On, this.On);
+    }
+    if (this.OutletInUse !== undefined) {
+      this.service.updateCharacteristic(this.platform.Characteristic.OutletInUse, this.OutletInUse);
+    }
   }
 
   /**
    * Handle requests to set the "On" characteristic
    */
-  async handleOnSet(value, callback) {
+  private OnSet(value: CharacteristicValue) {
     this.platform.log.debug('%s Triggered SET On:', this.deviceDef.devName, value);
 
-    await this.pushChanges();
-    this.refreshStatus();
-    callback(null);
+    this.On = value;
+    this.pushChanges();
   }
 }
