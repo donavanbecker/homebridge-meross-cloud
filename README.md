@@ -28,4 +28,5 @@ This Plugin allows you to control your Meross Devices from HomeKit.
 3. Input Meross E-mail and Password into Config.
 
 ## Supported Meross Devices
-  - MSS110
+
+- MSS110

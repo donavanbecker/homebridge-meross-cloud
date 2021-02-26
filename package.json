@@ -1,7 +1,7 @@
 {
   "displayName": "Homebridge Meross Cloud",
   "name": "homebridge-meross-cloud",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A Meross Cloud Plugin for Homebridge.",
   "license": "Apache-2.0",
   "author": "donavanbecker",
