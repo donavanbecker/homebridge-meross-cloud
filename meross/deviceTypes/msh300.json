@@ -85,5 +85,133 @@
                 "subDeviceIconId": "device001"
             }
         ]
+    },
+    {
+        "all": {
+            "system": {
+                "hardware": {
+                    "type": "msh300",
+                    "subType": "un",
+                    "version": "4.0.0",
+                    "chipType": "mt7686",
+                    "uuid": "1910236220872426280248e1e9108feb",
+                    "macAddress": "48:e1:e9:10:8f:eb"
+                },
+                "firmware": {
+                    "version": "4.1.26",
+                    "compileTime": "2020/11/07 16:29:31 GMT +08:00",
+                    "wifiMac": "c8:54:4b:d5:3d:09",
+                    "innerIp": "192.168.1.181",
+                    "server": "mqtt.meross.com",
+                    "port": 443,
+                    "userId": 568875
+                },
+                "online": {
+                    "status": 1
+                }
+            },
+            "digest": {
+                "hub": {
+                    "hubId": -384790549,
+                    "mode": 0,
+                    "subdevice": [
+                        {
+                            "id": "0100619D",
+                            "status": 1,
+                            "scheduleBMode": 6,
+                            "onoff": 1,
+                            "lastActiveTime": 1614355252,
+                            "mts100v3": {
+                                "mode": 0
+                            }
+                        },
+                        {
+                            "id": "010064E8",
+                            "status": 1,
+                            "scheduleBMode": 6,
+                            "onoff": 0,
+                            "lastActiveTime": 1614355236,
+                            "mts100v3": {
+                                "mode": 0
+                            }
+                        },
+                        {
+                            "id": "120027D13CF4",
+                            "status": 1,
+                            "onoff": 0,
+                            "lastActiveTime": 1614355225,
+                            "ms100": {
+                                "latestTime": 1614355225,
+                                "latestTemperature": 214,
+                                "latestHumidity": 490,
+                                "voltage": 2778
+                            }
+                        },
+                        {
+                            "id": "120027D146E4",
+                            "status": 1,
+                            "onoff": 0,
+                            "lastActiveTime": 1614355187,
+                            "ms100": {
+                                "latestTime": 1614355187,
+                                "latestTemperature": 200,
+                                "latestHumidity": 620,
+                                "voltage": 2736
+                            }
+                        },
+                        {
+                            "id": "01007A92",
+                            "status": 1,
+                            "scheduleBMode": 6,
+                            "onoff": 0,
+                            "lastActiveTime": 1614355219,
+                            "mts100v3": {
+                                "mode": 0
+                            }
+                        },
+                        {
+                            "id": "01004703",
+                            "status": 1,
+                            "scheduleBMode": 6,
+                            "onoff": 0,
+                            "lastActiveTime": 1614355294,
+                            "mts100v3": {
+                                "mode": 0
+                            }
+                        },
+                        {
+                            "id": "01002963",
+                            "status": 1,
+                            "scheduleBMode": 6,
+                            "onoff": 0,
+                            "lastActiveTime": 1614355216,
+                            "mts100v3": {
+                                "mode": 0
+                            }
+                        },
+                        {
+                            "id": "01004803",
+                            "status": 1,
+                            "scheduleBMode": 6,
+                            "onoff": 0,
+                            "lastActiveTime": 1614355260,
+                            "mts100v3": {
+                                "mode": 0
+                            }
+                        },
+                        {
+                            "id": "0100B475",
+                            "status": 1,
+                            "scheduleBMode": 6,
+                            "onoff": 0,
+                            "lastActiveTime": 1614355299,
+                            "mts100v3": {
+                                "mode": 0
+                            }
+                        }
+                    ]
+                }
+            }
+        }
     }
 ]

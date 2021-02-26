@@ -349,6 +349,12 @@ export class MerossCloudPlatform implements DynamicPlatformPlugin {
           this.log.error('Error: ' + JSON.stringify(error));
         }
       });
+      device.getSystemAbilities((error, results) => {
+        this.log.info('System-Abilities: ' + JSON.stringify(results));
+        if (error) {
+          this.log.error('Error: ' + JSON.stringify(error));
+        }
+      });
     }
   }
 }
