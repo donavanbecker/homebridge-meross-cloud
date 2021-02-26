@@ -129,10 +129,6 @@ export class hp110a {
         this.platform.log.debug(onoff);
         this.OnOff = onoff.onoff;
       }
-      for (const light of this.devicestatus.all.digest.light) {
-        this.platform.log.debug(light);
-        this.light = light;
-      }
       this.updateFirmware(result);
       try {
         this.parseStatus();
