@@ -1,0 +1,50 @@
+{
+    "all": {
+        "system": {
+            "hardware": {
+                "type": "hp110a",
+                "subType": "us",
+                "version": "4.0.0",
+                "chipType": "MT7686",
+                "uuid": "2003246861054090809448e1e9191b44",
+                "macAddress": "48:e1:e9:19:1b:44"
+            },
+            "firmware": {
+                "version": "4.1.22",
+                "compileTime": "Mar 18 2020 09:19:57",
+                "mcu": {
+                    "productId": "5adbusgachewfheh",
+                    "version": "1.5.3",
+                    "type": "hp110a_mcu"
+                },
+                "wifiMac": "48:dd:0c:ba:ae:05",
+                "innerIp": "192.168.4.59",
+                "server": "mqtt.meross.com",
+                "port": 443,
+                "userId": "48:dd:0c:ba:ae:05"
+            },
+            "online": {
+                "status": 1
+            }
+        },
+        "digest": {
+            "togglex": [
+                {
+                    "channel": 0,
+                    "onoff": 0,
+                    "lmTime": 1614280397
+                }
+            ],
+            "triggerx": [],
+            "timerx": [],
+            "light": {
+                "channel": 0,
+                "capacity": 5,
+                "luminance": 1,
+                "temperature": 50,
+                "rgb": 196864,
+                "effect": 4
+            }
+        }
+    }
+}
