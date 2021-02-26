@@ -1,0 +1,73 @@
+{
+    "all": {
+        "system": {
+            "hardware": {
+                "type": "mss530h",
+                "subType": "us",
+                "version": "3.0.0",
+                "chipType": "mt7682",
+                "uuid": "1903123698642539081034298f1bfd25",
+                "macAddress": "34:29:8f:1b:fd:25"
+            },
+            "firmware": {
+                "version": "3.1.2",
+                "compileTime": "2019/07/12 09:52:11 GMT +08:00",
+                "wifiMac": "2e:80:88:da:f8:a9",
+                "innerIp": "10.0.0.6",
+                "server": "mqtt.meross.com",
+                "port": 443,
+                "userId": 284399
+            },
+            "online": {
+                "status": 1
+            }
+        },
+        "digest": {
+            "togglex": [
+                {
+                    "channel": 0,
+                    "onoff": 0,
+                    "lmTime": 1614312004
+                },
+                {
+                    "channel": 1,
+                    "onoff": 0,
+                    "lmTime": 1614101947
+                },
+                {
+                    "channel": 2,
+                    "onoff": 0,
+                    "lmTime": 1614312004
+                },
+                {
+                    "channel": 3,
+                    "onoff": 0,
+                    "lmTime": 1614312004
+                }
+            ],
+            "triggerx": [],
+            "timerx": [
+                {
+                    "channel": 2,
+                    "id": "5c45e069b95cf715",
+                    "count": 10
+                },
+                {
+                    "channel": 3,
+                    "id": "f4eea32c4a113de9",
+                    "count": 10
+                },
+                {
+                    "channel": 2,
+                    "id": "ed1705f72f10d83e",
+                    "count": 4
+                },
+                {
+                    "channel": 3,
+                    "id": "ab40b309d73ecabd",
+                    "count": 4
+                }
+            ]
+        }
+    }
+}

@@ -125,6 +125,7 @@ export class MerossCloudPlatform implements DynamicPlatformPlugin {
         this.deviceInfo(device);
         switch (deviceDef.deviceType) {
           case 'mss110':
+          case 'mss310r':
             if (this.config.devicediscovery) {
               this.log.info('Discovered %s %s', deviceDef.devName, deviceDef.deviceType, deviceDef.uuid);
             }
