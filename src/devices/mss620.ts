@@ -14,16 +14,13 @@ import { eventNames, on } from 'process';
 export class mss620 {
   private service!: Service;
 
-  doSmartPlugUpdate: any;
-  OutletInUse;
-  OutletUpdateInProgress: any;
-  OutletUpdate: any;
-  meross: any;
-  channel: any;
   On!: CharacteristicValue;
-  onoff!: number;
-  devicestatus: any;
-  OnOff: any;
+  OutletInUse: CharacteristicValue;
+  OutletUpdateInProgress: any;
+  OutletUpdate: Subject<unknown>;
+  devicestatus!: Record<any, any>;
+  channel!: number;
+  OnOff!: number;
 
   constructor(
     private readonly platform: MerossCloudPlatform,
@@ -66,10 +63,10 @@ export class mss620 {
           .onSet(async (value: CharacteristicValue) => {
             this.OnSet(value);
           });
+
+        this.service.setCharacteristic(this.platform.Characteristic.OutletInUse, true);
       }
     }
-    
-    this.service.setCharacteristic(this.platform.Characteristic.OutletInUse, true);
     
 
     // Retrieve initial values and updateHomekit
