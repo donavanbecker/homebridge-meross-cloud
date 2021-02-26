@@ -3,8 +3,7 @@ import { Service, PlatformAccessory, CharacteristicValue } from 'homebridge';
 import { MerossCloudPlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { debounceTime, skipWhile, tap } from 'rxjs/operators';
-import MerossCloud, { DeviceDefinition, MerossCloudDevice } from 'meross-cloud';
-import { eventNames, on } from 'process';
+import { DeviceDefinition, MerossCloudDevice } from 'meross-cloud';
 
 /**
  * Platform Accessory
@@ -18,7 +17,8 @@ export class mss110 {
   OutletInUse!: CharacteristicValue;
   OutletUpdate: Subject<unknown>;
   OutletUpdateInProgress: boolean;
-  devicestatus: any;
+  devicestatus!: Record<any, any>;
+  OnOff!: number;
 
   constructor(
     private readonly platform: MerossCloudPlatform,
@@ -44,7 +44,7 @@ export class mss110 {
       .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Meross')
       .setCharacteristic(this.platform.Characteristic.Model, deviceDef.deviceType)
       .setCharacteristic(this.platform.Characteristic.SerialNumber, deviceDef.uuid)
-      .getCharacteristic(this.platform.Characteristic.FirmwareRevision).updateValue(accessory.context.firmwareRevision || '4.1.14');
+      .setCharacteristic(this.platform.Characteristic.FirmwareRevision, '4.1.14');
 
     // get the LightBulb service if it exists, otherwise create a new Outlet service
     // you can create multiple services for each accessory
@@ -71,9 +71,6 @@ export class mss110 {
     // create handlers for required characteristics
     this.service
       .getCharacteristic(this.platform.Characteristic.On)
-      .onGet(async () => {
-        return this.On;
-      })
       .onSet(async (value: CharacteristicValue) => {
         this.OnSet(value);
       });
@@ -116,8 +113,11 @@ export class mss110 {
    * Parse the device status from the SwitchBot api
    */
   parseStatus() {
-    //this.On === true;
-    //this.On === false;
+    if (this.OnOff === 0) {
+      this.On = false;
+    } else if (this.OnOff === 1) {
+      this.On = true;
+    }
     this.OutletInUse === true;
   }
 
@@ -125,52 +125,51 @@ export class mss110 {
    * Asks the SwitchBot API for the latest device information
    */
   async refreshStatus() {
-    this.device.on('data', (namespace: string, payload: any) => {
-      this.platform.log.debug('DEV: ' + this.deviceId + ' ' + namespace + ' - data: ' + JSON.stringify(payload));
-      this.devicestatus = payload;
+    this.device.getSystemAllData((error, result) => {
+      this.platform.log.debug('All-Data Refresh: ' + JSON.stringify(result));
+      if (error) {
+        this.platform.log.error('Error: ' + JSON.stringify(error));
+      }
+      this.devicestatus = result;
+      for (const onoff of this.devicestatus.all.digest.togglex) {
+        this.platform.log.debug(onoff);
+        this.OnOff = onoff.onoff;
+      }
+      this.updateFirmware(result);
       try {
         this.parseStatus();
         this.updateHomeKitCharacteristics();
       } catch (e) {
         this.platform.log.error(
-          '%s: %s - Failed to update status of %s',
-          this.deviceDef.devName,
-          this.deviceDef.deviceType,
-          this.deviceDef.devName,
+          '%s: - Failed to update status.',
+          this.accessory.displayName,
           JSON.stringify(e.message),
           this.platform.log.debug(
-            '%s: %s %s -',
-            this.deviceDef.devName,
-            this.deviceDef.deviceType,
+            '%s: Error -',
             this.accessory.displayName,
             JSON.stringify(e)),
         );
       }
     });
+  }
 
-
+  private updateFirmware(result: Record<any, any>) {
+    this.accessory
+      .getService(this.platform.Service.AccessoryInformation)!
+      .getCharacteristic(this.platform.Characteristic.FirmwareRevision).updateValue(result.all.system.firmware.version);
   }
 
   /**
    * Pushes the requested changes to the SwitchBot API
    */
   async pushChanges() {
-    if (this.On) {
-      this.device.controlToggle(true, (err, res) => {
-        this.platform.log.debug('ToggleX Response: err: ' + err + ', res: ' + JSON.stringify(res));
-        this.platform.log.info(this.deviceId + '.' + ': set value ' + this.On)
-        ;
+    setTimeout(() => {
+      this.platform.log.info('Toggle %s to %s', this.accessory.displayName, this.On);
+      this.device.controlToggleX(0, Boolean(this.On), (err, res) => {
+        this.platform.log.debug('Toggle Response: err: ' + err + ', res: ' + JSON.stringify(res.all));
+        this.refreshStatus();
       });
-    } else {
-      this.device.controlToggle(false, (err, res) => {
-        this.platform.log.debug('ToggleX Response: err: ' + err + ', res: ' + JSON.stringify(res));
-        this.platform.log.info(this.deviceId + '.' + ': set value ' + this.On)
-        ;
-      });
-    }
-    // Make the API request
-    this.platform.log.debug('Outlet %s Changes pushed -', this.accessory.displayName);
-    await this.refreshStatus();
+    }, 2000);
   }
 
   /**
@@ -188,10 +187,10 @@ export class mss110 {
   /**
    * Handle requests to set the "On" characteristic
    */
-  private OnSet(value: CharacteristicValue) {
-    this.platform.log.debug('%s Triggered SET On:', this.deviceDef.devName, value);
+  private async OnSet(value: CharacteristicValue) {
+    this.platform.log.debug('%s Triggered SET On:', this.accessory.displayName, value);
 
     this.On = value;
-    this.pushChanges();
+    await this.pushChanges();
   }
 }

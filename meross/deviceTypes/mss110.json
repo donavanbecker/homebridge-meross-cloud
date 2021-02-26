@@ -37,5 +37,80 @@
                 "channel": 2
             }
         ]
+    },
+    {
+        "payloadVersion": 1,
+        "ability": {
+            "Appliance.Config.Key": {},
+            "Appliance.Config.WifiList": {},
+            "Appliance.Config.Wifi": {},
+            "Appliance.Config.Trace": {},
+            "Appliance.Config.Info": {},
+            "Appliance.System.All": {},
+            "Appliance.System.Hardware": {},
+            "Appliance.System.Firmware": {},
+            "Appliance.System.Debug": {},
+            "Appliance.System.Online": {},
+            "Appliance.System.Time": {},
+            "Appliance.System.Clock": {},
+            "Appliance.System.Ability": {},
+            "Appliance.System.Runtime": {},
+            "Appliance.System.Report": {},
+            "Appliance.System.Position": {},
+            "Appliance.System.DNDMode": {},
+            "Appliance.Control.Multiple": {
+                "maxCmdNum": 5
+            },
+            "Appliance.Control.ToggleX": {},
+            "Appliance.Control.TimerX": {
+                "sunOffsetSupport": 1
+            },
+            "Appliance.Control.TriggerX": {},
+            "Appliance.Control.Bind": {},
+            "Appliance.Control.Unbind": {},
+            "Appliance.Control.Upgrade": {},
+            "Appliance.Digest.TriggerX": {},
+            "Appliance.Digest.TimerX": {}
+        }
+    },
+    {
+        "all": {
+            "system": {
+                "hardware": {
+                    "type": "mss110",
+                    "subType": "us",
+                    "version": "4.0.0",
+                    "chipType": "MT7686",
+                    "uuid": "2010275590986451852948e1e9397ad0",
+                    "macAddress": "48:e1:e9:39:7a:d0"
+                },
+                "firmware": {
+                    "version": "4.1.14",
+                    "homekitVersion": "2.0.1",
+                    "compileTime": "Dec 29 2020 17:08:40",
+                    "wifiMac": "f8:bb:bf:40:7a:a6",
+                    "innerIp": "192.168.7.203",
+                    "server": "mqtt.meross.com",
+                    "port": 443,
+                    "userId": 497555
+                },
+                "online": {
+                    "status": 1,
+                    "bindId": "KadgedVyzAsOUSpF",
+                    "who": 1
+                }
+            },
+            "digest": {
+                "togglex": [
+                    {
+                        "channel": 0,
+                        "onoff": 0,
+                        "lmTime": 1611373480
+                    }
+                ],
+                "triggerx": [],
+                "timerx": []
+            }
+        }
     }
 ]

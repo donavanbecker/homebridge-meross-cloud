@@ -7,3 +7,14 @@ export const PLATFORM_NAME = 'MerossCloud';
  * This must match the name of your plugin as defined the package.json
  */
 export const PLUGIN_NAME = 'homebridge-meross-cloud';
+
+import { PlatformConfig } from 'homebridge';
+
+//Config
+export interface MerossCloudPlatformConfig extends PlatformConfig {
+  devicediscovery?: boolean;
+  email?: string;
+  password?: string;
+  refreshRate?: number;
+  hide_device?: string[];
+}

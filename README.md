@@ -26,3 +26,6 @@ This Plugin allows you to control your Meross Devices from HomeKit.
 1. Download Meross App on App Store or Google Play Store.
 2. Register a Meross account and log in into your account.
 3. Input Meross E-mail and Password into Config.
+
+## Supported Meross Devices
+  - MSS110

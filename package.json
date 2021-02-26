@@ -1,7 +1,7 @@
 {
   "displayName": "Homebridge Meross Cloud",
   "name": "homebridge-meross-cloud",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "A Meross Cloud Plugin for Homebridge.",
   "license": "Apache-2.0",
   "author": "donavanbecker",
@@ -13,12 +13,12 @@
     "url": "https://github.com/donavanbecker/homebridge-meross-cloud/issues"
   },
   "engines": {
-    "node": ">=14.15.3",
+    "node": ">=14.15.4",
     "homebridge": ">=1.3.1"
   },
   "main": "dist/index.js",
   "scripts": {
-    "audit": "npm update && npm audit fix",
+    "update": "npm update",
     "lint": "eslint src/**.ts",
     "watch": "npm run build && npm link && nodemon",
     "build": "rimraf ./dist && tsc",
@@ -39,7 +39,7 @@
   ],
   "dependencies": {
     "meross-cloud": "^1.3.6",
-    "rxjs": "^6.6.3",
+    "rxjs": "^6.6.6",
     "source-map-support": "^0.5.19"
   },
   "devDependencies": {
@@ -49,11 +49,11 @@
     "eslint": "^7.20.0",
     "eslint-plugin-prettier": "^3.3.1",
     "homebridge": "^1.3.1",
-    "homebridge-config-ui-x": "^4.39.0",
+    "homebridge-config-ui-x": "^4.39.1",
     "nodemon": "^2.0.7",
     "prettier": "^2.2.1",
     "rimraf": "^3.0.2",
     "ts-node": "^9.1.1",
-    "typescript": "^4.1.5"
+    "typescript": "^4.2.2"
   }
 }
