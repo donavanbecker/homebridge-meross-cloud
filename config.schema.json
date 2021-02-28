@@ -36,6 +36,11 @@
         "name": "Device Discovery",
         "type": "boolean",
         "description": "Enable Device Info Logging."
+      },
+      "appendDeviceTypeSuffix": {
+        "name": "Device Type Suffix",
+        "type": "boolean",
+        "description": "Append device type onto device name on discovery."
       }
     }
   }

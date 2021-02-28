@@ -146,7 +146,8 @@ export class MerossCloudPlatform implements DynamicPlatformPlugin {
       this.log.info('Adding new accessory: %s %s Device ID: %s', deviceDef.devName, deviceDef.deviceType, deviceId);
 
       // create a new accessory
-      const accessory = new this.api.platformAccessory(`${deviceDef.devName} ${deviceDef.deviceType}`, uuid);
+      const accessorySuffix = this.config!.appendDeviceTypeSuffix ? ` ${deviceDef.deviceType}` : '';
+      const accessory = new this.api.platformAccessory(`${deviceDef.devName}${accessorySuffix}`, uuid);
 
       // create the accessory handler for the newly create accessory
       // this is imported from `platformAccessory.ts`

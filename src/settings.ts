@@ -12,6 +12,7 @@ import { PlatformConfig } from 'homebridge';
 
 //Config
 export interface MerossCloudPlatformConfig extends PlatformConfig {
+  appendDeviceTypeSuffix?: boolean;
   devicediscovery?: boolean;
   email?: string;
   password?: string;
