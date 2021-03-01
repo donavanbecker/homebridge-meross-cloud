@@ -20,6 +20,7 @@ export class hp110a {
   devicestatus!: Record<any, any>;
   OnOff!: number;
   light: any;
+  channel: any;
 
   constructor(
     private readonly platform: MerossCloudPlatform,
@@ -128,6 +129,7 @@ export class hp110a {
       for (const onoff of this.devicestatus.all.digest.togglex) {
         this.platform.log.debug(onoff);
         this.OnOff = onoff.onoff;
+        this.channel = onoff.chanel;
       }
       this.updateFirmware(result);
       try {

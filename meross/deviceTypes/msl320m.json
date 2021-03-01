@@ -1,0 +1,137 @@
+[
+    {
+        "all": {
+            "system": {
+                "hardware": {
+                    "type": "msl320m",
+                    "subType": "un",
+                    "version": "2.0.0",
+                    "chipType": "mt7682",
+                    "uuid": "2007292712859990822348e1e9270a53",
+                    "macAddress": "48:e1:e9:27:0a:53"
+                },
+                "firmware": {
+                    "version": "2.1.2",
+                    "compileTime": "2020/07/07 16:11:46 GMT +08:00",
+                    "wifiMac": "d8:47:32:d2:f8:ae",
+                    "innerIp": "192.168.1.162",
+                    "server": "mqtt.meross.com",
+                    "port": 443,
+                    "userId": 1167862
+                },
+                "online": {
+                    "status": 1
+                }
+            },
+            "digest": {
+                "togglex": [
+                    {
+                        "channel": 0,
+                        "onoff": 1,
+                        "lmTime": 1614607094
+                    }
+                ],
+                "triggerx": [],
+                "timerx": [],
+                "light": {
+                    "capacity": 6,
+                    "channel": 0,
+                    "rgb": 9207155,
+                    "temperature": 40,
+                    "luminance": 73,
+                    "transform": -1
+                }
+            }
+        }
+    },
+    {
+        "all": {
+            "system": {
+                "hardware": {
+                    "type": "msl320m",
+                    "subType": "un",
+                    "version": "2.0.0",
+                    "chipType": "mt7682",
+                    "uuid": "2007203905833590821248e1e9260e8b",
+                    "macAddress": "48:e1:e9:26:0e:8b"
+                },
+                "firmware": {
+                    "version": "2.1.2",
+                    "compileTime": "2020/07/07 16:11:46 GMT +08:00",
+                    "wifiMac": "d8:47:32:d2:f8:ae",
+                    "innerIp": "192.168.1.214",
+                    "server": "mqtt.meross.com",
+                    "port": 443,
+                    "userId": 1167862
+                },
+                "online": {
+                    "status": 1
+                }
+            },
+            "digest": {
+                "togglex": [
+                    {
+                        "channel": 0,
+                        "onoff": 1,
+                        "lmTime": 1614607093
+                    }
+                ],
+                "triggerx": [],
+                "timerx": [],
+                "light": {
+                    "capacity": 6,
+                    "channel": 0,
+                    "rgb": 9207155,
+                    "temperature": 40,
+                    "luminance": 73,
+                    "transform": -1
+                }
+            }
+        }
+    },
+    {
+        "all": {
+            "system": {
+                "hardware": {
+                    "type": "msl320m",
+                    "subType": "un",
+                    "version": "2.0.0",
+                    "chipType": "mt7682",
+                    "uuid": "2007206450164990821248e1e9261a00",
+                    "macAddress": "48:e1:e9:26:1a:00"
+                },
+                "firmware": {
+                    "version": "2.1.2",
+                    "compileTime": "2020/07/07 16:11:46 GMT +08:00",
+                    "wifiMac": "d8:47:32:d2:f8:ae",
+                    "innerIp": "192.168.1.225",
+                    "server": "mqtt.meross.com",
+                    "port": 443,
+                    "userId": 1167862
+                },
+                "online": {
+                    "status": 1
+                }
+            },
+            "digest": {
+                "togglex": [
+                    {
+                        "channel": 0,
+                        "onoff": 1,
+                        "lmTime": 1614607092
+                    }
+                ],
+                "triggerx": [],
+                "timerx": [],
+                "light": {
+                    "capacity": 6,
+                    "channel": 0,
+                    "rgb": 9207155,
+                    "temperature": 40,
+                    "luminance": 73,
+                    "transform": -1
+                }
+            }
+        }
+    }
+]

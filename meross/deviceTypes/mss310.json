@@ -1,0 +1,37 @@
+{
+    "all": {
+        "system": {
+            "hardware": {
+                "type": "mss310",
+                "subType": "us",
+                "version": "2.0.0",
+                "chipType": "mt7682",
+                "uuid": "19010841385712251a1334298f14691f",
+                "macAddress": "34:29:8f:14:69:1f"
+            },
+            "firmware": {
+                "version": "2.1.16",
+                "compileTime": "2020/09/28 15:51:07 GMT +08:00",
+                "wifiMac": "80:72:15:e0:38:22",
+                "innerIp": "192.168.0.140",
+                "server": "mqtt-eu.meross.com",
+                "port": 443,
+                "userId": 250689
+            },
+            "online": {
+                "status": 1
+            }
+        },
+        "digest": {
+            "togglex": [
+                {
+                    "channel": 0,
+                    "onoff": 1,
+                    "lmTime": 74
+                }
+            ],
+            "triggerx": [],
+            "timerx": []
+        }
+    }
+}

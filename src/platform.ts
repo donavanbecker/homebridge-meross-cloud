@@ -24,6 +24,12 @@ export class MerossCloudPlatform implements DynamicPlatformPlugin {
       return;
     }
 
+    // HOOBS notice
+    if (__dirname.includes('hoobs')) {
+      this.log.warn('This plugin has not been tested under HOOBS, it is highly recommended that ' +
+        'you switch to Homebridge: https://git.io/Jtxb0');
+    }
+
     // verify the config
     try {
       this.verifyConfig();
@@ -125,6 +131,8 @@ export class MerossCloudPlatform implements DynamicPlatformPlugin {
         this.deviceInfo(device);
         switch (deviceDef.deviceType) {
           case 'mss110':
+          case 'mss210':
+          case 'mss310':
           case 'mss310r':
             if (this.config.devicediscovery) {
               this.log.info('Discovered %s %s', deviceDef.devName, deviceDef.deviceType, deviceDef.uuid);

@@ -87,5 +87,64 @@
             "domain": "mqtt-eu.meross.com",
             "reservedDomain": "mqtt-eu-alter.meross.com"
         }
+    },
+    {
+        "all": {
+            "system": {
+                "hardware": {
+                    "type": "mss425e",
+                    "subType": "eu",
+                    "version": "1.0.0",
+                    "chipType": "MT7687",
+                    "uuid": "1803195486867629080634298f154505",
+                    "macAddress": "34:29:8f:15:45:05"
+                },
+                "firmware": {
+                    "version": "1.1.9",
+                    "compileTime": "2018-11-20 18:02:46",
+                    "wifiMac": "80:72:15:e0:38:22",
+                    "innerIp": "192.168.0.2",
+                    "server": "mqtt-eu.meross.com",
+                    "port": 443,
+                    "secondServer": "mqtt-eu.meross.com",
+                    "secondPort": 443,
+                    "userId": 250689
+                },
+                "online": {
+                    "status": 1
+                }
+            },
+            "digest": {
+                "togglex": [
+                    {
+                        "channel": 0,
+                        "onoff": 1,
+                        "lmTime": 1614464832
+                    },
+                    {
+                        "channel": 1,
+                        "onoff": 1,
+                        "lmTime": 1614464832
+                    },
+                    {
+                        "channel": 2,
+                        "onoff": 1,
+                        "lmTime": 1614464832
+                    },
+                    {
+                        "channel": 3,
+                        "onoff": 1,
+                        "lmTime": 1614464832
+                    },
+                    {
+                        "channel": 4,
+                        "onoff": 1,
+                        "lmTime": 1614464832
+                    }
+                ],
+                "triggerx": [],
+                "timerx": []
+            }
+        }
     }
 ]

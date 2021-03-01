@@ -47,5 +47,42 @@
             "domain": "mqtt-eu.meross.com",
             "reservedDomain": "mqtt-eu-alter.meross.com"
         }
+    },
+    {
+        "all": {
+            "system": {
+                "hardware": {
+                    "type": "mss210",
+                    "subType": "us",
+                    "version": "6.0.0",
+                    "chipType": "rtl8710cf",
+                    "uuid": "2011055687001551803748e1e93a5997",
+                    "macAddress": "48:e1:e9:3a:59:97"
+                },
+                "firmware": {
+                    "version": "6.1.8",
+                    "compileTime": "2020/07/03-11:01:20",
+                    "wifiMac": "3c:a6:2f:5c:e4:bf",
+                    "innerIp": "192.168.178.78",
+                    "server": "mqtt.meross.com",
+                    "port": 443,
+                    "userId": 1173642
+                },
+                "online": {
+                    "status": 1
+                }
+            },
+            "digest": {
+                "togglex": [
+                    {
+                        "channel": 0,
+                        "onoff": 1,
+                        "lmTime": 1613829026
+                    }
+                ],
+                "triggerx": [],
+                "timerx": []
+            }
+        }
     }
 ]
