@@ -54,8 +54,7 @@ export class hp110a {
 
     this.platform.log.debug('Setting Up %s ', deviceDef.devName, JSON.stringify(deviceDef));
     (this.service = this.accessory.getService(deviceDef.devName)
-      || this.accessory.addService(this.platform.Service.Lightbulb, deviceDef.devName, deviceDef.devName)),
-    `${deviceDef.devName} ${deviceDef.deviceType}`;
+      || this.accessory.addService(this.platform.Service.Lightbulb, deviceDef.devName, deviceDef.devName)), accessory.displayName;
 
     // To avoid "Cannot add a Service with the same UUID another Service without also defining a unique 'subtype' property." error,
     // when creating multiple services of the same type, you need to use the following syntax to specify a name and subtype id:
@@ -73,9 +72,7 @@ export class hp110a {
     // create handlers for required characteristics
     this.service
       .getCharacteristic(this.platform.Characteristic.On)
-      .onSet(async (value: CharacteristicValue) => {
-        this.OnSet(value);
-      });
+      .onSet(this.OnSet.bind(this));
 
     // Retrieve initial values and updateHomekit
     this.updateHomeKitCharacteristics();
@@ -165,10 +162,10 @@ export class hp110a {
         this.platform.log.debug('Toggle Response: err: ' + err + ', res: ' + JSON.stringify(res.all));
         await this.refreshStatus();
       });
-      this.device.controlLight(this.On, async (err, res) => {
+      /*this.device.controlLight(this.On, async (err, res) => {
         this.platform.log.warn('Toggle Response: err: ' + err + ', res: ' + JSON.stringify(res.all));
         await this.refreshStatus();
-      });
+      });*/
     }, 2000);
   }
 

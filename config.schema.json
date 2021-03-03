@@ -32,11 +32,77 @@
           "type": "string"
         }
       },
+      "refreshRate": {
+        "title": "Refresh Rate",
+        "type": "number",
+        "placeholder": 300,
+        "description": "Indicates the number of seconds between polls of the Honeywell Home service."
+      },
       "devicediscovery": {
         "name": "Device Discovery",
         "type": "boolean",
         "description": "Enable Device Info Logging."
       }
     }
-  }
+  },
+  "layout": [
+        "name",
+        "email",
+        "password",
+    {
+      "type": "fieldset",
+      "title": "Advanced Settings",
+      "expandable": true,
+      "expanded": false,
+      "items": [
+        {
+          "type": "help",
+          "helpvalue": "<h5>Refresh Rate</h5><em class='primary-text'>Refresh Rate indicates the number of seconds between polls to the Meross Cloud.</em>"
+        },
+        {
+          "key": "refreshRate",
+          "notitle": true
+        },
+        {
+          "type": "fieldset",
+          "title": "Hidden Devices",
+          "expandable": true,
+          "expanded": false,
+          "items": [
+            {
+              "type": "help",
+              "helpvalue": "<h5>Hide Device</h5><em class='primary-text'>Hide Device allows you to hide a device using it's deviceID.</em>"
+            },
+            {
+              "key": "hide_device",
+              "notitle": true,
+              "add": "Add Another Device",
+              "type": "array",
+              "items": [
+                {
+                  "type": "div",
+                  "displayFlex": true,
+                  "flex-direction": "row",
+                  "items": [
+                    {
+                      "key": "hide_device[]",
+                      "placeholder": "31213782524133762963059f2f040c89f"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "help",
+          "helpvalue": "<h5>Device Discovery</h5><em class='primary-text'>Enables Device Info Logging, only use if your deivce isn't supported yet.</em>"
+        },
+        {
+          "key": "devicediscovery",
+          "title": "Device Discovery"
+        }
+      ]
+    }
+  ]
 }

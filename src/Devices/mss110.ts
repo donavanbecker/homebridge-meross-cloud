@@ -52,8 +52,7 @@ export class mss110 {
 
     this.platform.log.debug('Setting Up %s ', deviceDef.devName, JSON.stringify(deviceDef));
     (this.service = this.accessory.getService(deviceDef.devName)
-      || this.accessory.addService(this.platform.Service.Outlet, deviceDef.devName, deviceDef.devName)),
-    `${deviceDef.devName} ${deviceDef.deviceType}`;
+      || this.accessory.addService(this.platform.Service.Outlet, deviceDef.devName, deviceDef.devName)), accessory.displayName;
 
     // To avoid "Cannot add a Service with the same UUID another Service without also defining a unique 'subtype' property." error,
     // when creating multiple services of the same type, you need to use the following syntax to specify a name and subtype id:
@@ -71,9 +70,7 @@ export class mss110 {
     // create handlers for required characteristics
     this.service
       .getCharacteristic(this.platform.Characteristic.On)
-      .onSet(async (value: CharacteristicValue) => {
-        this.OnSet(value);
-      });
+      .onSet(this.OnSet.bind(this));
 
     this.service.setCharacteristic(this.platform.Characteristic.OutletInUse, true);
 

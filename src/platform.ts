@@ -93,8 +93,8 @@ export class MerossCloudPlatform implements DynamicPlatformPlugin {
     // Hide Devices by DeviceID
     this.config.hide_device = this.config.hide_device || [];
 
-    if (this.config.refreshRate! < 120) {
-      throw new Error('Refresh Rate must be above 120 (2 minutes).');
+    if (this.config.refreshRate! < 30) {
+      throw new Error('Refresh Rate must be above 30 (30 seconds).');
     }
 
     if (!this.config.refreshRate) {
@@ -126,7 +126,6 @@ export class MerossCloudPlatform implements DynamicPlatformPlugin {
 
     meross.on('deviceInitialized', (deviceId, deviceDef, device) => {
       this.log.debug('New device ' + deviceId + ': ' + JSON.stringify(deviceDef));
-      
       device.on('connected', () => {
         this.deviceInfo(device);
         switch (deviceDef.deviceType) {
@@ -145,7 +144,7 @@ export class MerossCloudPlatform implements DynamicPlatformPlugin {
             }
             this.createHP110A(deviceDef, device, deviceId);
             break;
-          case 'mss620':
+          case '/mss620':
             if (this.config.devicediscovery) {
               this.log.info('Discovered %s %s', deviceDef.devName, deviceDef.deviceType, deviceDef.uuid);
             }
@@ -159,7 +158,7 @@ export class MerossCloudPlatform implements DynamicPlatformPlugin {
             );
         }
       });
-      
+
     });
 
     meross.connect((error) => {

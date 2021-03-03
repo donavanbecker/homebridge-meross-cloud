@@ -52,22 +52,19 @@ export class mss620 {
       if (channels.devName) {
         this.platform.log.debug('Setting Up %s ', channels.devName, JSON.stringify(channels));
         (this.service = this.accessory.getService(channels.devName)
-          || this.accessory.addService(this.platform.Service.Outlet, channels.devName, channels.devName)),
-        `${deviceDef.devName} ${deviceDef.deviceType}`;
+          || this.accessory.addService(this.platform.Service.Outlet, channels.devName, channels.devName)), accessory.displayName;
         this.service.setCharacteristic(this.platform.Characteristic.Name, `${channels.devName} ${deviceDef.deviceType}`);
 
         // each service must implement at-minimum the "required characteristics" for the given service type
         // see https://developers.homebridge.io/#/service/Outlet
         this.service
           .getCharacteristic(this.platform.Characteristic.On)
-          .onSet(async (value: CharacteristicValue) => {
-            this.OnSet(value);
-          });
+          .onSet(this.OnSet.bind(this));
 
         this.service.setCharacteristic(this.platform.Characteristic.OutletInUse, true);
       }
     }
-    
+
 
     // Retrieve initial values and updateHomekit
     this.updateHomeKitCharacteristics();
