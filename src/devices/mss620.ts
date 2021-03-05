@@ -16,6 +16,9 @@ export class mss620 {
 
   On!: CharacteristicValue;
   OutletInUse: CharacteristicValue;
+  FirmwareRevision!: CharacteristicValue;
+  FirmwareUpdateStatus!: CharacteristicValue;
+  FirmwareUpdateReadiness!: CharacteristicValue;
   OutletUpdateInProgress: any;
   OutletUpdate: Subject<unknown>;
   devicestatus!: Record<any, any>;
@@ -32,6 +35,13 @@ export class mss620 {
     // default placeholders
     this.On = false;
     this.OutletInUse = false;
+    if (this.platform.config.firmware){
+      this.FirmwareRevision = this.platform.FirmwareOverride;
+    } else {
+      this.FirmwareRevision = deviceDef.fmwareVersion;
+    }
+    this.FirmwareUpdateStatus = true;
+    this.FirmwareUpdateReadiness = true;
 
     // this is subject we use to track when we need to POST changes to the SwitchBot API
     this.OutletUpdate = new Subject();
@@ -46,7 +56,9 @@ export class mss620 {
       .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Meross')
       .setCharacteristic(this.platform.Characteristic.Model, deviceDef.deviceType)
       .setCharacteristic(this.platform.Characteristic.SerialNumber, deviceDef.uuid)
-      .setCharacteristic(this.platform.Characteristic.FirmwareRevision, '4.1.29');
+      .setCharacteristic(this.platform.Characteristic.FirmwareRevision, this.FirmwareRevision)
+      .setCharacteristic(this.platform.Characteristic.FirmwareUpdateStatus, this.FirmwareUpdateStatus)
+      .setCharacteristic(this.platform.Characteristic.FirmwareUpdateReadiness, this.FirmwareRevision);
 
     for (const channels of deviceDef.channels) {
       if (channels.devName) {
@@ -138,9 +150,15 @@ export class mss620 {
   }
 
   private updateFirmware(result: Record<any, any>) {
-    this.accessory
-      .getService(this.platform.Service.AccessoryInformation)!
-      .getCharacteristic(this.platform.Characteristic.FirmwareRevision).updateValue(result.all.system.firmware.version);
+    if (this.platform.config.firmware){
+      this.accessory
+        .getService(this.platform.Service.AccessoryInformation)!
+        .getCharacteristic(this.platform.Characteristic.FirmwareRevision).updateValue(this.platform.FirmwareOverride);
+    } else {
+        this.accessory
+          .getService(this.platform.Service.AccessoryInformation)!
+          .getCharacteristic(this.platform.Characteristic.FirmwareRevision).updateValue(result.all.system.firmware.version);
+    }
   }
 
   /**

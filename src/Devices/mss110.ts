@@ -15,6 +15,9 @@ export class mss110 {
 
   On!: CharacteristicValue;
   OutletInUse!: CharacteristicValue;
+  FirmwareUpdateReadiness!: CharacteristicValue;
+  FirmwareRevision!: CharacteristicValue;
+  FirmwareUpdateStatus!: CharacteristicValue;
   OutletUpdate: Subject<unknown>;
   OutletUpdateInProgress: boolean;
   devicestatus!: Record<any, any>;
@@ -30,6 +33,13 @@ export class mss110 {
     // default placeholders
     this.On = false;
     this.OutletInUse = false;
+    if (this.platform.config.firmware){
+      this.FirmwareRevision = this.platform.FirmwareOverride;
+    } else {
+      this.FirmwareRevision = deviceDef.fmwareVersion;
+    }
+    this.FirmwareUpdateStatus = true;
+    this.FirmwareUpdateReadiness = true;
 
     // this is subject we use to track when we need to POST changes to the SwitchBot API
     this.OutletUpdate = new Subject();
@@ -44,7 +54,9 @@ export class mss110 {
       .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Meross')
       .setCharacteristic(this.platform.Characteristic.Model, deviceDef.deviceType)
       .setCharacteristic(this.platform.Characteristic.SerialNumber, deviceDef.uuid)
-      .setCharacteristic(this.platform.Characteristic.FirmwareRevision, '4.1.14');
+      .setCharacteristic(this.platform.Characteristic.FirmwareRevision, this.FirmwareRevision)
+      .setCharacteristic(this.platform.Characteristic.FirmwareUpdateStatus, this.FirmwareUpdateStatus)
+      .setCharacteristic(this.platform.Characteristic.FirmwareUpdateReadiness, this.FirmwareRevision);
 
     // get the LightBulb service if it exists, otherwise create a new Outlet service
     // you can create multiple services for each accessory
@@ -146,9 +158,15 @@ export class mss110 {
   }
 
   private updateFirmware(result: Record<any, any>) {
+    if (this.platform.config.firmware){
     this.accessory
       .getService(this.platform.Service.AccessoryInformation)!
-      .getCharacteristic(this.platform.Characteristic.FirmwareRevision).updateValue(result.all.system.firmware.version);
+      .getCharacteristic(this.platform.Characteristic.FirmwareRevision).updateValue(this.platform.FirmwareOverride);
+    } else {
+      this.accessory
+        .getService(this.platform.Service.AccessoryInformation)!
+        .getCharacteristic(this.platform.Characteristic.FirmwareRevision).updateValue(result.all.system.firmware.version);
+    }
   }
 
   /**

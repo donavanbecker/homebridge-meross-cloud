@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/).
 
+## [Version 1.1.1](https://github.com/donavanbecker/homebridge-meross-cloud/compare/v1.1.0...v1.1.1) (2021-03-05)
+
+### Changes
+
+- Added Firmware Override Option to the Config to override any Update Availables someone might have.
+
 ## [Version 1.1.0](https://github.com/donavanbecker/homebridge-meross-cloud/compare/v1.0.1...v1.1.0) (2021-03-02)
 
 ### Changes
