@@ -16,6 +16,7 @@ export class MerossCloudPlatform implements DynamicPlatformPlugin {
 
   // this is used to track restored cached accessories
   public readonly accessories: PlatformAccessory[] = [];
+  FirmwareOverride!: string;
 
   constructor(public readonly log: Logger, public readonly config: MerossCloudPlatformConfig, public readonly api: API) {
     this.log.debug('Finished initializing platform:', this.config.name);
@@ -89,6 +90,9 @@ export class MerossCloudPlatform implements DynamicPlatformPlugin {
     this.config.devicediscovery;
     this.config!.email!;
     this.config!.password!;
+    if (this.config.firmware) {
+      this.FirmwareOverride = '10.10.10';
+    }
 
     // Hide Devices by DeviceID
     this.config.hide_device = this.config.hide_device || [];

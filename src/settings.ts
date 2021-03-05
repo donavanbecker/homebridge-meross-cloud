@@ -16,5 +16,6 @@ export interface MerossCloudPlatformConfig extends PlatformConfig {
   email?: string;
   password?: string;
   refreshRate?: number;
+  firmware?: boolean;
   hide_device?: string[];
 }
