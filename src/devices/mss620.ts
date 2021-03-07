@@ -17,8 +17,6 @@ export class mss620 {
   On!: CharacteristicValue;
   OutletInUse: CharacteristicValue;
   FirmwareRevision!: CharacteristicValue;
-  FirmwareUpdateStatus!: CharacteristicValue;
-  FirmwareUpdateReadiness!: CharacteristicValue;
   OutletUpdateInProgress: any;
   OutletUpdate: Subject<unknown>;
   devicestatus!: Record<any, any>;
@@ -40,8 +38,6 @@ export class mss620 {
     } else {
       this.FirmwareRevision = deviceDef.fmwareVersion;
     }
-    this.FirmwareUpdateStatus = true;
-    this.FirmwareUpdateReadiness = true;
 
     // this is subject we use to track when we need to POST changes to the SwitchBot API
     this.OutletUpdate = new Subject();
@@ -56,9 +52,7 @@ export class mss620 {
       .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Meross')
       .setCharacteristic(this.platform.Characteristic.Model, deviceDef.deviceType)
       .setCharacteristic(this.platform.Characteristic.SerialNumber, deviceDef.uuid)
-      .setCharacteristic(this.platform.Characteristic.FirmwareRevision, this.FirmwareRevision)
-      .setCharacteristic(this.platform.Characteristic.FirmwareUpdateStatus, this.FirmwareUpdateStatus)
-      .setCharacteristic(this.platform.Characteristic.FirmwareUpdateReadiness, this.FirmwareRevision);
+      .setCharacteristic(this.platform.Characteristic.FirmwareRevision, this.FirmwareRevision);
 
     for (const channels of deviceDef.channels) {
       if (channels.devName) {
