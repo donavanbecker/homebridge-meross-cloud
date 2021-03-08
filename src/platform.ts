@@ -1,9 +1,10 @@
 import { API, DynamicPlatformPlugin, Logger, PlatformAccessory, Service, Characteristic } from 'homebridge';
 import { PLATFORM_NAME, PLUGIN_NAME, MerossCloudPlatformConfig } from './settings';
 import MerossCloud, { DeviceDefinition, MerossCloudDevice } from 'meross-cloud';
-import { mss110 } from './Devices/mss110';
+import { Outlet } from './devices/Outlets';
 import { mss620 } from './devices/mss620';
 import { hp110a } from './devices/hp110a';
+import { Switch } from './devices/Switches';
 
 /**
  * HomebridgePlatform
@@ -140,7 +141,13 @@ export class MerossCloudPlatform implements DynamicPlatformPlugin {
             if (this.config.devicediscovery) {
               this.log.info('Discovered %s %s', deviceDef.devName, deviceDef.deviceType, deviceDef.uuid);
             }
-            this.createMSS110(deviceDef, device, deviceId);
+            this.createOutlet(deviceDef, device, deviceId);
+            break;
+          case 'mss510x':
+            if (this.config.devicediscovery) {
+              this.log.info('Discovered %s %s', deviceDef.devName, deviceDef.deviceType, deviceDef.uuid);
+            }
+            this.createSwitch(deviceDef, device, deviceId);
             break;
           case 'hp110a':
             if (this.config.devicediscovery) {
@@ -208,7 +215,7 @@ export class MerossCloudPlatform implements DynamicPlatformPlugin {
     });
   }
 
-  private async createMSS110(deviceDef: DeviceDefinition, device: MerossCloudDevice, deviceId: string) {
+  private async createOutlet(deviceDef: DeviceDefinition, device: MerossCloudDevice, deviceId: string) {
     this.log.debug(`${deviceDef.deviceType} UDID: ${deviceDef.devName}-${deviceDef.uuid}-${deviceDef.deviceType}`);
     const uuid = this.api.hap.uuid.generate(`${deviceDef.devName}-${deviceDef.uuid}-${deviceDef.deviceType}`);
 
@@ -223,7 +230,7 @@ export class MerossCloudPlatform implements DynamicPlatformPlugin {
 
         // create the accessory handler for the restored accessory
         // this is imported from `platformAccessory.ts`
-        new mss110(this, existingAccessory, device, deviceId, deviceDef);
+        new Outlet(this, existingAccessory, device, deviceId, deviceDef);
       } else {
         this.unregisterPlatformAccessories(existingAccessory);
       }
@@ -237,7 +244,53 @@ export class MerossCloudPlatform implements DynamicPlatformPlugin {
 
       // create the accessory handler for the newly create accessory
       // this is imported from `platformAccessory.ts`
-      new mss110(this, accessory, device, deviceId, deviceDef);
+      new Outlet(this, accessory, device, deviceId, deviceDef);
+
+      // link the accessory to your platform
+      this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
+      this.accessories.push(accessory);
+    } else {
+      if (!this.config.hide_device?.includes(deviceId)) {
+        this.log.error(
+          'Unable to Register new device: %s %s - %s',
+          deviceDef.devName,
+          deviceDef.deviceType,
+          deviceDef.uuid,
+        );
+      }
+    }
+  }
+
+  private async createSwitch(deviceDef: DeviceDefinition, device: MerossCloudDevice, deviceId: string) {
+    this.log.debug(`${deviceDef.deviceType} UDID: ${deviceDef.devName}-${deviceDef.uuid}-${deviceDef.deviceType}`);
+    const uuid = this.api.hap.uuid.generate(`${deviceDef.devName}-${deviceDef.uuid}-${deviceDef.deviceType}`);
+
+    // see if an accessory with the same uuid has already been registered and restored from
+    // the cached devices we stored in the `configureAccessory` method above
+    const existingAccessory = this.accessories.find((accessory) => accessory.UUID === uuid);
+
+    if (existingAccessory) {
+      // the accessory already exists
+      if (deviceDef.onlineStatus === 1 && !this.config.hide_device?.includes(deviceId)) {
+        this.log.info('Restoring existing accessory from cache: %s %s Device ID: %s', deviceDef.devName, deviceDef.deviceType, deviceId);
+
+        // create the accessory handler for the restored accessory
+        // this is imported from `platformAccessory.ts`
+        new Switch(this, existingAccessory, device, deviceId, deviceDef);
+      } else {
+        this.unregisterPlatformAccessories(existingAccessory);
+      }
+    } else if (deviceDef.onlineStatus === 1 && !this.config.hide_device?.includes(deviceId)) {
+      // the accessory does not yet exist, so we need to create it
+      this.log.debug(`${deviceDef.deviceType} UDID: ${deviceDef.devName}-${deviceDef.uuid}-${deviceDef.deviceType}`);
+      this.log.info('Adding new accessory: %s %s Device ID: %s', deviceDef.devName, deviceDef.deviceType, deviceId);
+
+      // create a new accessory
+      const accessory = new this.api.platformAccessory(`${deviceDef.devName} ${deviceDef.deviceType}`, uuid);
+
+      // create the accessory handler for the newly create accessory
+      // this is imported from `platformAccessory.ts`
+      new Switch(this, accessory, device, deviceId, deviceDef);
 
       // link the accessory to your platform
       this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);

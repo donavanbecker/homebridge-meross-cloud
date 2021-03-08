@@ -10,7 +10,7 @@ import { DeviceDefinition, MerossCloudDevice } from 'meross-cloud';
  * An instance of this class is created for each accessory your platform registers
  * Each accessory may expose multiple services of different service types.
  */
-export class mss110 {
+export class Switch {
   private service!: Service;
 
   On!: CharacteristicValue;
@@ -52,23 +52,13 @@ export class mss110 {
       .setCharacteristic(this.platform.Characteristic.SerialNumber, deviceDef.uuid)
       .setCharacteristic(this.platform.Characteristic.FirmwareRevision, this.FirmwareRevision);
 
-    // get the LightBulb service if it exists, otherwise create a new Outlet service
-    // you can create multiple services for each accessory
-    // {"type":"Switch","devName":"Nursery Lamps","devIconId":"device001"}
-
+    // get the Switch service if it exists, otherwise create a new Switch service
     this.platform.log.debug('Setting Up %s ', deviceDef.devName, JSON.stringify(deviceDef));
-    (this.service = this.accessory.getService(deviceDef.devName)
-      || this.accessory.addService(this.platform.Service.Outlet, deviceDef.devName, deviceDef.devName)), accessory.displayName;
+    (this.service =
+      accessory.getService(this.platform.Service.Switch) ||
+      accessory.addService(this.platform.Service.Switch)), accessory.displayName;
 
-    // To avoid "Cannot add a Service with the same UUID another Service without also defining a unique 'subtype' property." error,
-    // when creating multiple services of the same type, you need to use the following syntax to specify a name and subtype id:
-    // this.accessory.getService('NAME') ?? this.accessory.addService(this.platform.Service.Outlet, 'NAME', 'USER_DEFINED_SUBTYPE');
-
-    // set the service name, this is what is displayed as the default name on the Home app
-    // in this example we are using the name we stored in the `accessory.context` in the `discoverDevices` method.
-
-
-    this.service.setCharacteristic(this.platform.Characteristic.Name, `${deviceDef.devName} ${deviceDef.deviceType}`);
+    this.service.setCharacteristic(this.platform.Characteristic.Name, accessory.displayName);
 
     // each service must implement at-minimum the "required characteristics" for the given service type
     // see https://developers.homebridge.io/#/service/Outlet
@@ -77,8 +67,6 @@ export class mss110 {
     this.service
       .getCharacteristic(this.platform.Characteristic.On)
       .onSet(this.OnSet.bind(this));
-
-    this.service.setCharacteristic(this.platform.Characteristic.OutletInUse, true);
 
     // Retrieve initial values and updateHomekit
     this.updateHomeKitCharacteristics();
