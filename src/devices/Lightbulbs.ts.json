@@ -2,16 +2,11 @@ import { Service, PlatformAccessory, CharacteristicValue, HAPStatus } from 'home
 import { MerossCloudPlatform } from '../platform';
 import { interval } from 'rxjs';
 import {
-  DevicesConfig,
-  data,
   numberToColour,
   RGBToHSL,
   colourToNumber,
   HSLToRGB,
   PLATFORM_NAME,
-  payload,
-  light,
-  header,
 } from '../settings';
 
 export class lightBulb {
@@ -24,17 +19,13 @@ export class lightBulb {
   Hue?: CharacteristicValue;
 
   deviceStatus: any;
-  Namespace!: header['namespace'];
-  Payload!: payload;
-  Data!: data;
-  Request!: string;
-  rgb_d: light['rgb'];
-  mr_temp!: light['temperature'];
+  devicestatus: any;
+  OnOff: any;
 
   constructor(
     private readonly platform: MerossCloudPlatform,
     private accessory: PlatformAccessory,
-    public device: DevicesConfig,
+    public device,
   ) {
     // default placeholders
     switch (device.model) {
@@ -200,54 +191,47 @@ export class lightBulb {
     }
   }
 
+  /**
+   * Asks the SwitchBot API for the latest device information
+   */
   async refreshStatus() {
-    // Namespace
-    switch (this.device.model) {
-      case 'MSL-320':
-      case 'msl320m':
-        this.Namespace = 'Appliance.System.Online';
-        break;
-      default:
-        this.Namespace = 'Appliance.System.All';
-    }
+    this.device.getSystemAllData((error, result) => {
+      this.platform.log.debug('All-Data Refresh: ' + JSON.stringify(result));
+      if (error) {
+        this.platform.log.error('Error: ' + JSON.stringify(error));
+      }
+      this.devicestatus = result;
+      for (const onoff of this.devicestatus.all.digest.togglex) {
+        this.platform.log.debug(onoff);
+        this.OnOff = onoff.onoff;
+      }
+      this.updateFirmware(result);
+      try {
+        this.parseStatus();
+        this.updateHomeKitCharacteristics();
+      } catch (e) {
+        this.platform.log.error(
+          '%s: - Failed to update status.',
+          this.accessory.displayName,
+          JSON.stringify(e.message),
+          this.platform.log.debug(
+            '%s: Error -',
+            this.accessory.displayName,
+            JSON.stringify(e)),
+        );
+      }
+    });
+  }
 
-    try {
-      this.platform.log.debug('%s - Reading', this.device.model, `${this.device.deviceUrl}/status`);
-      const deviceStatus = (
-        await this.platform.axios({
-          url: `http://${this.device.deviceUrl}/config`,
-          method: 'post',
-          data: {
-            payload: {},
-            header: {
-              messageId: `${this.device.messageId}`,
-              method: 'GET',
-              from: `http://${this.device.deviceUrl}/config`,
-              namespace: this.Namespace,
-              timestamp: this.device.timestamp,
-              sign: `${this.device.sign}`,
-              payloadVersion: 1,
-            },
-          },
-        },
-        )).data;
-      this.platform.log.debug(
-        '%s %s refreshStatus -',
-        this.device.model,
-        this.accessory.displayName,
-        JSON.stringify(deviceStatus),
-      );
-      this.parseStatus();
-      this.updateHomeKitCharacteristics();
-    } catch (e) {
-      this.platform.log.error(
-        '%s - Failed to refresh status of %s: %s',
-        this.device.model,
-        this.device.name,
-        JSON.stringify(e.message),
-        this.platform.log.debug('%s %s -', this.device.model, this.accessory.displayName, JSON.stringify(e)),
-      );
-      this.apiError(e);
+  private updateFirmware(result: Record<any, any>) {
+    if (this.platform.config.firmware){
+    this.accessory
+      .getService(this.platform.Service.AccessoryInformation)!
+      .getCharacteristic(this.platform.Characteristic.FirmwareRevision).updateValue(this.platform.FirmwareOverride);
+    } else {
+      this.accessory
+        .getService(this.platform.Service.AccessoryInformation)!
+        .getCharacteristic(this.platform.Characteristic.FirmwareRevision).updateValue(result.all.system.firmware.version);
     }
   }
 

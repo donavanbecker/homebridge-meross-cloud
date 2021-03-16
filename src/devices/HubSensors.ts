@@ -24,6 +24,8 @@ export class Meter {
 
   meterUpdateInProgress!: boolean;
   doMeterUpdate!: Subject<unknown>;
+  devicestatus: any;
+  OnOff: any;
 
   constructor(
     private readonly platform: MerossCloudPlatform,
@@ -148,7 +150,7 @@ export class Meter {
    */
   parseStatus() {
     // Set Room Sensor State
-    if (this.deviceStatus.body) {
+    if (this.devicestatus.body) {
       this.BatteryLevel = 100;
     } else {
       this.BatteryLevel = 10;
@@ -160,18 +162,18 @@ export class Meter {
     }
     // Current Relative Humidity
     if (!this.platform.config.options?.meter?.hide_humidity) {
-      this.CurrentRelativeHumidity = this.deviceStatus.body.humidity!;
+      this.CurrentRelativeHumidity = this.devicestatus.body.humidity!;
       this.platform.log.debug('Meter %s - Humidity: %s%', this.accessory.displayName, this.CurrentRelativeHumidity);
     }
 
     // Current Temperature
     if (!this.platform.config.options?.meter?.hide_temperature) {
       if (this.platform.config.options?.meter?.unit === 1) {
-        this.CurrentTemperature = this.toFahrenheit(this.deviceStatus.body.temperature!);
+        this.CurrentTemperature = this.toFahrenheit(this.devicestatus.body.temperature!);
       } else if (this.platform.config.options?.meter?.unit === 0) {
-        this.CurrentTemperature = this.toCelsius(this.deviceStatus.body.temperature!);
+        this.CurrentTemperature = this.toCelsius(this.devicestatus.body.temperature!);
       } else {
-        this.CurrentTemperature = this.deviceStatus.body.temperature!;
+        this.CurrentTemperature = this.devicestatus.body.temperature!;
       }
       this.platform.log.debug('Meter %s - Temperature: %s°c', this.accessory.displayName, this.CurrentTemperature);
     }
@@ -181,29 +183,44 @@ export class Meter {
    * Asks the SwitchBot API for the latest device information
    */
   async refreshStatus() {
-    try {
-      const deviceStatus: deviceStatusResponse = (
-        await this.platform.axios.get(`${DeviceURL}/${this.device.deviceId}/status`)
-      ).data;
-      if (deviceStatus.message === 'success') {
-        this.deviceStatus = deviceStatus;
-        this.platform.log.debug(
-          'Meter %s refreshStatus -',
-          this.accessory.displayName,
-          JSON.stringify(this.deviceStatus),
-        );
-
+    this.device.getSystemAllData((error, result) => {
+      this.platform.log.debug('All-Data Refresh: ' + JSON.stringify(result));
+      if (error) {
+        this.platform.log.error('Error: ' + JSON.stringify(error));
+      }
+      this.devicestatus = result;
+      for (const onoff of this.devicestatus.all.digest.togglex) {
+        this.platform.log.debug(onoff);
+        this.OnOff = onoff.onoff;
+      }
+      this.updateFirmware(result);
+      try {
         this.parseStatus();
         this.updateHomeKitCharacteristics();
+      } catch (e) {
+        this.platform.log.error(
+          '%s: - Failed to update status.',
+          this.accessory.displayName,
+          JSON.stringify(e.message),
+          this.platform.log.debug(
+            '%s: Error -',
+            this.accessory.displayName,
+            JSON.stringify(e)),
+        );
       }
-    } catch (e) {
-      this.platform.log.error(
-        'Meter - Failed to update status of',
-        this.deviceDef.devName,
-        JSON.stringify(e.message),
-        this.platform.log.debug('Meter %s -', this.accessory.displayName, JSON.stringify(e)),
-      );
-      this.apiError(e);
+    });
+  }
+
+
+  private updateFirmware(result: Record<any, any>) {
+    if (this.platform.config.firmware){
+    this.accessory
+      .getService(this.platform.Service.AccessoryInformation)!
+      .getCharacteristic(this.platform.Characteristic.FirmwareRevision).updateValue(this.platform.FirmwareOverride);
+    } else {
+      this.accessory
+        .getService(this.platform.Service.AccessoryInformation)!
+        .getCharacteristic(this.platform.Characteristic.FirmwareRevision).updateValue(result.all.system.firmware.version);
     }
   }
 
