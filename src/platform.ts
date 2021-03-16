@@ -2,7 +2,7 @@ import { API, DynamicPlatformPlugin, Logger, PlatformAccessory, Service, Charact
 import { PLATFORM_NAME, PLUGIN_NAME, MerossCloudPlatformConfig } from './settings';
 import MerossCloud, { DeviceDefinition, MerossCloudDevice } from 'meross-cloud';
 import { Outlet } from './devices/Outlets';
-import { mss620 } from './devices/mss620';
+import { MultiOutlet } from './devices/MultiOutlet';
 import { hp110a } from './devices/hp110a';
 import { Switch } from './devices/Switches';
 
@@ -18,6 +18,7 @@ export class MerossCloudPlatform implements DynamicPlatformPlugin {
   // this is used to track restored cached accessories
   public readonly accessories: PlatformAccessory[] = [];
   FirmwareOverride!: string;
+  debugMode!: boolean;
 
   constructor(public readonly log: Logger, public readonly config: MerossCloudPlatformConfig, public readonly api: API) {
     this.log.debug('Finished initializing platform:', this.config.name);
@@ -41,6 +42,8 @@ export class MerossCloudPlatform implements DynamicPlatformPlugin {
       this.log.debug(JSON.stringify(e));
       return;
     }
+
+    this.debugMode = process.argv.includes('-D') || process.argv.includes('--debug');
 
     // When this event is fired it means Homebridge has restored all cached accessories from disk.
     // Dynamic Platform plugins should only register new accessories after this event was fired,
@@ -136,6 +139,7 @@ export class MerossCloudPlatform implements DynamicPlatformPlugin {
         switch (deviceDef.deviceType) {
           case 'mss110':
           case 'mss210':
+          case 'mss210n':
           case 'mss310':
           case 'mss310r':
             if (this.config.devicediscovery) {
@@ -156,10 +160,12 @@ export class MerossCloudPlatform implements DynamicPlatformPlugin {
             this.createHP110A(deviceDef, device, deviceId);
             break;
           case '/mss620':
+          case '/mss420f':
+          case '/mss425f':
             if (this.config.devicediscovery) {
               this.log.info('Discovered %s %s', deviceDef.devName, deviceDef.deviceType, deviceDef.uuid);
             }
-            this.createMSS620(deviceDef, device, deviceId);
+            this.createMulitOutlet(deviceDef, device, deviceId);
             break;
           default:
             this.log.info(
@@ -353,7 +359,7 @@ export class MerossCloudPlatform implements DynamicPlatformPlugin {
     }
   }
 
-  private async createMSS620(deviceDef: DeviceDefinition, device: MerossCloudDevice, deviceId: string) {
+  private async createMulitOutlet(deviceDef: DeviceDefinition, device: MerossCloudDevice, deviceId: string) {
     this.log.debug(`${deviceDef.deviceType} UDID: ${deviceDef.devName}-${deviceDef.uuid}-${deviceDef.deviceType}`);
     const uuid = this.api.hap.uuid.generate(`${deviceDef.devName}-${deviceDef.uuid}-${deviceDef.deviceType}`);
 
@@ -368,7 +374,7 @@ export class MerossCloudPlatform implements DynamicPlatformPlugin {
 
         // create the accessory handler for the restored accessory
         // this is imported from `platformAccessory.ts`
-        new mss620(this, existingAccessory, device, deviceId, deviceDef);
+        new MultiOutlet(this, existingAccessory, device, deviceId, deviceDef);
       } else {
         this.unregisterPlatformAccessories(existingAccessory);
       }
@@ -382,7 +388,7 @@ export class MerossCloudPlatform implements DynamicPlatformPlugin {
 
       // create the accessory handler for the newly create accessory
       // this is imported from `platformAccessory.ts`
-      new mss620(this, accessory, device, deviceId, deviceDef);
+      new MultiOutlet(this, accessory, device, deviceId, deviceDef);
 
       // link the accessory to your platform
       this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
