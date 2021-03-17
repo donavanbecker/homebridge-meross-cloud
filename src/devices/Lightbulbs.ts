@@ -21,6 +21,10 @@ export class lightBulb {
   deviceStatus: any;
   devicestatus: any;
   OnOff: any;
+  Data;
+  Payload: any;
+  mr_temp!: number;
+  rgb_d: any;
 
   constructor(
     private readonly platform: MerossCloudPlatform,
@@ -260,28 +264,6 @@ export class lightBulb {
         payloadVersion: 1,
       },
     };
-
-    try {
-      // Make request
-      const push = await this.platform.axios({
-        url: `http://${this.device.deviceUrl}/config`,
-        method: 'post',
-        data: this.Data,
-      });
-
-      const powerState = this.On ? 'On' : 'Off';
-      this.platform.log.info('Setting power state to %s for %s', powerState, this.accessory.displayName);
-      this.platform.log.debug('%s %s Changes pushed -', this.device.model, this.accessory.displayName, JSON.stringify(push.data));
-    } catch (e) {
-      this.platform.log.error(
-        'Failed to POST to the Meross Device %s at %s:',
-        this.device.model,
-        this.device.deviceUrl,
-        JSON.stringify(e.message),
-      );
-      this.platform.log.debug('Plug %s -', this.accessory.displayName, JSON.stringify(e));
-      this.apiError(e);
-    }
   }
 
   async pushBrightnessChanges() {
@@ -329,27 +311,6 @@ export class lightBulb {
         payloadVersion: 1,
       },
     };
-
-    try {
-      // Make request
-      const push = await this.platform.axios({
-        url: `http://${this.device.deviceUrl}/config`,
-        method: 'post',
-        data: this.Data,
-      });
-
-      this.platform.log.info('Setting brightness to %s for %s', this.Brightness, this.accessory.displayName);
-      this.platform.log.debug('%s %s Changes pushed -', this.device.model, this.accessory.displayName, JSON.stringify(push.data));
-    } catch (e) {
-      this.platform.log.error(
-        'Failed to POST to the Meross Device %s at %s:',
-        this.device.model,
-        this.device.deviceUrl,
-        JSON.stringify(e.message),
-      );
-      this.platform.log.debug('Plug %s -', this.accessory.displayName, JSON.stringify(e));
-      this.apiError(e);
-    }
   }
 
   async pushColorTemperatureChanges() {
@@ -386,27 +347,6 @@ export class lightBulb {
         payloadVersion: 1,
       },
     };
-
-    try {
-      // Make request
-      const push = await this.platform.axios({
-        url: `http://${this.device.deviceUrl}/config`,
-        method: 'post',
-        data: this.Data,
-      });
-
-      this.platform.log.info('Changing color temperature to %s for %s', this.ColorTemperature, this.accessory.displayName);
-      this.platform.log.debug('%s %s Changes pushed -', this.device.model, this.accessory.displayName, JSON.stringify(push.data));
-    } catch (e) {
-      this.platform.log.error(
-        'Failed to POST to the Meross Device %s at %s:',
-        this.device.model,
-        this.device.deviceUrl,
-        JSON.stringify(e.message),
-      );
-      this.platform.log.debug('Plug %s -', this.accessory.displayName, JSON.stringify(e));
-      this.apiError(e);
-    }
   }
 
   async pushSaturationChanges() {
@@ -441,27 +381,6 @@ export class lightBulb {
         payloadVersion: 1,
       },
     };
-
-    try {
-      // Make request
-      const push = await this.platform.axios({
-        url: `http://${this.device.deviceUrl}/config`,
-        method: 'post',
-        data: this.Data,
-      });
-
-      this.platform.log.info('Changing light saturation to rgb value %s for %s', this.rgb_d, this.accessory.displayName);
-      this.platform.log.debug('%s %s Changes pushed -', this.device.model, this.accessory.displayName, JSON.stringify(push.data));
-    } catch (e) {
-      this.platform.log.error(
-        'Failed to POST to the Meross Device %s at %s:',
-        this.device.model,
-        this.device.deviceUrl,
-        JSON.stringify(e.message),
-      );
-      this.platform.log.debug('Plug %s -', this.accessory.displayName, JSON.stringify(e));
-      this.apiError(e);
-    }
   }
 
   updateHomeKitCharacteristics() {
