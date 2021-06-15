@@ -3,15 +3,14 @@ import { Service, PlatformAccessory, Characteristic, CharacteristicEventTypes, C
 import { MerossCloudPlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { debounceTime, skipWhile, tap } from 'rxjs/operators';
-import MerossCloud, { DeviceDefinition, MerossCloudDevice } from 'meross-cloud';
-import { eventNames, on } from 'process';
+import { DeviceDefinition, MerossCloudDevice } from 'meross-cloud';
 
 /**
  * Platform Accessory
  * An instance of this class is created for each accessory your platform registers
  * Each accessory may expose multiple services of different service types.
  */
-export class mss620 {
+export class MultiOutlet {
   private service!: Service;
 
   On!: CharacteristicValue;

@@ -1,0 +1,74 @@
+{
+    "all": {
+        "system": {
+            "hardware": {
+                "type": "msh300",
+                "subType": "un",
+                "version": "4.0.0",
+                "chipType": "mt7686",
+                "uuid": "2009159050560690830848e1e933f3ce",
+                "macAddress": "48:e1:e9:33:f3:ce"
+            },
+            "firmware": {
+                "version": "4.1.26",
+                "compileTime": "2020/11/07 16:29:31 GMT +08:00",
+                "wifiMac": "00:11:32:a4:b5:d9",
+                "innerIp": "172.16.1.16",
+                "server": "mqtt.meross.com",
+                "port": 443,
+                "userId": 889218
+            },
+            "online": {
+                "status": 1
+            }
+        },
+        "digest": {
+            "hub": {
+                "hubId": -382471218,
+                "mode": 0,
+                "subdevice": [
+                    {
+                        "id": "120027D1C067",
+                        "status": 1,
+                        "onoff": 0,
+                        "lastActiveTime": 1614349027,
+                        "ms100": {
+                            "latestTime": 1614349027,
+                            "latestTemperature": 227,
+                            "latestHumidity": 470,
+                            "voltage": 2780
+                        }
+                    },
+                    {
+                        "id": "120027D1C241",
+                        "status": 1,
+                        "onoff": 0,
+                        "lastActiveTime": 1614349054,
+                        "ms100": {
+                            "latestTime": 1614349054,
+                            "latestTemperature": 233,
+                            "latestHumidity": 470,
+                            "voltage": 2714
+                        }
+                    },
+                    {
+                        "id": "120027D1BF89",
+                        "status": 2
+                    },
+                    {
+                        "id": "120027D1E1EF",
+                        "status": 1,
+                        "onoff": 0,
+                        "lastActiveTime": 1614349153,
+                        "ms100": {
+                            "latestTime": 1614349153,
+                            "latestTemperature": 207,
+                            "latestHumidity": 490,
+                            "voltage": 2774
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}
