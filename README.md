@@ -30,3 +30,10 @@ This Plugin allows you to control your Meross Devices from HomeKit.
 ## Supported Meross Devices
 
 - MSS110
+- MSS210
+- MSS210n
+- MSS310
+- MSS310r
+- MSS510x
+- hp110a
+  - Only on and off
