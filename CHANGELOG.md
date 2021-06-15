@@ -2,26 +2,26 @@
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/).
 
-## [Version 1.2.0](https://github.com/donavanbecker/homebridge-meross-cloud/compare/v1.1.2...v1.2.0) (2021-06-15)
+## [Version 1.2.0](https://github.com/homebridge-plugins/homebridge-meross-cloud/compare/v1.1.2...v1.2.0) (2021-06-15)
 
 ### Changes
 
 - Add Support for mss510x.
 - Housekeeping and updated dependencies.
 
-## [Version 1.1.2](https://github.com/donavanbecker/homebridge-meross-cloud/compare/v1.1.1...v1.1.2) (2021-03-06)
+## [Version 1.1.2](https://github.com/homebridge-plugins/homebridge-meross-cloud/compare/v1.1.1...v1.1.2) (2021-03-06)
 
 ### Changes
 
 - Housekeeping.
 
-## [Version 1.1.1](https://github.com/donavanbecker/homebridge-meross-cloud/compare/v1.1.0...v1.1.1) (2021-03-05)
+## [Version 1.1.1](https://github.com/homebridge-plugins/homebridge-meross-cloud/compare/v1.1.0...v1.1.1) (2021-03-05)
 
 ### Changes
 
 - Added Firmware Override Option to the Config to override any Update Availables someone might have.
 
-## [Version 1.1.0](https://github.com/donavanbecker/homebridge-meross-cloud/compare/v1.0.1...v1.1.0) (2021-03-02)
+## [Version 1.1.0](https://github.com/homebridge-plugins/homebridge-meross-cloud/compare/v1.0.1...v1.1.0) (2021-03-02)
 
 ### Changes
 
@@ -30,13 +30,13 @@ All notable changes to this project will be documented in this file. This projec
 - Add Support for mss310r.
 - Add Support for hp110a, On and Off only.
 
-## [Version 1.0.1](https://github.com/donavanbecker/homebridge-meross-cloud/compare/v1.0.0...v1.0.1) (2021-02-26)
+## [Version 1.0.1](https://github.com/homebridge-plugins/homebridge-meross-cloud/compare/v1.0.0...v1.0.1) (2021-02-26)
 
 ### Changes
 
 - Fix for devicediscovery.
 
-## [Version 1.0.0](https://github.com/donavanbecker/homebridge-meross-cloud/releases/tag/v1.0.0) (2021-02-25)
+## [Version 1.0.0](https://github.com/homebridge-plugins/homebridge-meross-cloud/releases/tag/v1.0.0) (2021-02-25)
 
 ### Changes
 

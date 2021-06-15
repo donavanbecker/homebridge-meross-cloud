@@ -3,7 +3,7 @@ name: Add Feature Support
 about: Suggest an idea for this project
 title: ''
 labels: 'enhancment'
-assignees: 'donavanbecker'
+assignees: 'homebridge-plugins'
 ---
 
 **Is your feature request related to a problem? Please describe.**

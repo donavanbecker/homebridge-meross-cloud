@@ -32,7 +32,7 @@ jobs:
 
   publish-npm:
     # publish only if we are on our own repo, event was 'release' (a tag was created) and the tag starts with "v" (aka version tag)
-    if: github.repository == 'donavanbecker/homebridge-meross-cloud' && github.event_name == 'release' && startsWith(github.ref, 'refs/tags/v')
+    if: github.repository == 'homebridge-plugins/homebridge-meross-cloud' && github.event_name == 'release' && startsWith(github.ref, 'refs/tags/v')
 
     needs: build # only run if build succeeds
 
